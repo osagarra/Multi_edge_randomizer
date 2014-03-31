@@ -571,6 +571,124 @@ int * w_graph_compute_w(w_graph* node, int N_nodes, int* aux, int zeros){
     return w;
 }
 
+double** w_graph_compute_p_w_analitic_from_s_undirected(int maxt, double binn, int* s, int N_nodes, int self_opt, int* len){
+    // computes already normalized p
+    printf("Computeing w, tmax:%d\n",maxt); fflush(stdout);
+    int i,j,t,aux;
+    int T=sum_vec_int(s,N_nodes);
+    double norm,mu;
+    double** p=cast_mat_double(2,N_nodes);
+    mu=0;
+    norm=0;
+    aux=0;
+    t=1;
+    for(i=0;i<N_nodes;i++)
+    {
+        for(j=0;j<i;j++)
+        {
+            norm+=1.-(double)exp(-(double)s[i]*(double)s[j]/(double)T);
+        }
+        if(self_opt>0)
+        {
+            norm+=1.-(double)exp(-(double)s[i]*(double)s[i]/(double)T);
+        }
+    }
+    while(t<maxt+1)
+    {
+        p[0][aux]=t;
+        p[1][aux]=0;
+        //fact=factorial(t);
+        for(i=0;i<N_nodes;i++)
+        {
+            for(j=0;j<i;j++)
+            {
+                mu = (double)s[i]*(double)s[j]/(double)T;
+                p[1][aux]+=gsl_ran_poisson_pdf (t, mu);
+                if(t==0)norm+=(double)exp(-mu);
+            }
+            if(self_opt>0)
+            {
+                mu = (double)s[i]*(double)s[i]/(double)T;
+                if(t==0)norm+=(double)exp(-mu);
+                p[1][aux]+=gsl_ran_poisson_pdf (t, mu);
+            }
+        }
+        p[1][aux]=p[1][aux]/norm;
+        printf("done %d\n",t); fflush(stdout);
+        if(t<10){
+            t++;
+        }else{
+            t=t*binn;
+        }
+        aux++;
+    }
+    (*len)=aux;
+    printf("done: %d\n",aux); fflush(stdout);
+    realloc(p[0],sizeof(double)*aux);
+    realloc(p[1],sizeof(double)*aux);
+    return p;
+}
+
+double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int** s, int N_nodes, int self_opt, int* len){
+    // computes already normalized p
+    //printf("Computeing w, tmax:%d\n",maxt); fflush(stdout);
+    int i,j,t,aux;
+    int T=sum_vec_int(s[0],N_nodes);
+    double norm,mu;
+    double** p=cast_mat_double(2,N_nodes);
+    mu=0;
+    norm=(double)N_nodes;
+    aux=0;
+    t=1;
+    for(i=0;i<N_nodes;i++)
+    {
+        for(j=0;j<N_nodes;j++)
+        {
+            mu = (double)s[0][i]*(double)s[1][j]/(double)T;
+            if(i!=j)norm+=1.-(double)exp(-mu);
+        }
+        if(self_opt>0)
+        {
+            mu = (double)s[0][i]*(double)s[1][i]/(double)T;
+           norm+=1.-(double)exp(-mu);
+        }
+    }
+    while(t<maxt+1)
+    {
+        p[0][aux]=t;
+        p[1][aux]=0;
+        for(i=0;i<N_nodes;i++)
+        {
+            for(j=0;j<N_nodes;j++)
+            {
+                if(j!=i)
+                {
+                    mu = (double)s[0][i]*(double)s[1][j]/(double)T;
+                    p[1][aux]+=gsl_ran_poisson_pdf (t, mu);
+                }
+            }
+            if(self_opt>0)
+            {
+                mu = (double)s[0][i]*(double)s[1][j]/(double)T;
+                p[1][aux]+=gsl_ran_poisson_pdf (t, mu);
+            }
+        }
+        p[1][aux]=p[1][aux]/norm;
+        //printf("done %d\n",t); fflush(stdout);
+        if(t<10){
+            t++;
+        }else{
+            t=t*binn;
+        }
+        aux++;
+    }
+    (*len)=aux;
+    //printf("done\n"); fflush(stdout);
+    realloc(p[0],sizeof(double)*aux);
+    realloc(p[1],sizeof(double)*aux);
+    return p;
+}
+
 double * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight){
 //int * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight){
     int E;
@@ -730,7 +848,7 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
 }
 
 
-void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, double av_k, int opt_dir){
+void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, double av_k, int opt_dir, int self_opt, int w_anal){
     //w(sin sout), w(kin,kout), w
     int **k=w_graph_compute_k(node, N_nodes);
     int **s=w_graph_compute_s(node, N_nodes);
@@ -756,11 +874,33 @@ void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, doub
     print_acc(cadena, h1, h1);
     gsl_histogram_free(h1);
 
-    
+    /// analitical w /////
+    if(w_anal>0)
+    {
+        double** pp;
+        int lenn;
+        if(opt_dir>0)
+        {
+            pp = w_graph_compute_p_w_analitic_from_s_directed(10*q,1.5,s,N_nodes, self_opt, &lenn);
+        }else{
+            pp = w_graph_compute_p_w_analitic_from_s_undirected(10*q,1.5,s[0],N_nodes, self_opt, &lenn);
+        }
+        sprintf(cadena,"N%davs%8.5f_w_anal.hist",N_nodes,av_k);
+        FILE* fil=open_file("w", cadena);
+        fprintf(fil,"# t p(t) # \n");
+        int i;
+        for(i=0;i<lenn;i++)
+        {
+            fprintf(fil,"%.8f %.8f\n",pp[0][i],pp[1][i]);
+        }
+        fclose(fil);
+        free(pp[0]);
+        free(pp[1]);
+        free(pp);
+    }
     sout=vec_int_to_double(w,E);
     xranges=log_bins_double(0, max_value_double(wss,E) , 1.05, &xbins);
     yy=y_of_x(wss, sout, xranges,  E,  xbins);
-
     sprintf(cadena,"N%davs%8.5f_w_s_oi.hist",N_nodes,av_k);
     print_hist2d_mean(cadena, yy[1], yy[2], yy[0], xbins-1);
     free(sout);
@@ -778,6 +918,7 @@ void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, doub
     free(xranges);
     free_mat_double(yy,4);
 
+    
 //// free all
     free_mat_int(s,2);
     free_mat_int(k,2);

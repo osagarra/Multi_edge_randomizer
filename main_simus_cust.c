@@ -23,6 +23,7 @@
  *		9. Verbose (1 for on, 0 for off)
  * 		10. Clustering option (warning: Depending on av_s makes simulations orders of magnitude slower for non-sparse networks (E>>N)
  * 		11. Self-loop option (>0 for accepting them)
+ *      12. Compute analytic distribution of weights? (>0 for yes, takes some time)
  *
  *	Output:
  *		
@@ -41,7 +42,7 @@
 
 
 int main(int argc, char *argv[]){
-	if(argc!=12){               
+	if(argc!=13){
 		fprintf(stderr,	"\nCorrect usage is: ./simus N_nodes seed av_w exp xmin xmax dir_opt ensemble_opt print_opt\n\nWhere:\n\n"
 				" *             N_nodes. Number of nodes (int)\n"
 				" *             seed.initial seed for random generator (int)\n"
@@ -53,7 +54,8 @@ int main(int argc, char *argv[]){
 				" *             Number of reps for averaging (int)\n"
 				" *             Verbose (1 for on, 0 for off)\n"
 				" *             Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower)\n"
-				" *             Self-loop option (>0 for accepting them) \n\n"
+				" *             Self-loop option (>0 for accepting them) \n
+                " *             Compute analytic distribution of weights? (>0 for yes, takes some time)\n\n"
 				"Please, read the DOCS/README file for more info!\n");
 		return 0;
 	}
@@ -76,6 +78,7 @@ int main(int argc, char *argv[]){
 	int verbose					=atoi(argv[9]);
 	int opt_clust				=atoi(argv[10]);
 	int self_opt				=atoi(argv[11]);
+    int w_anal                  =atoi(argv[12]);
 	
 	/****** Check all in params are good ******/
 	if(bin_exp<=1) bin_exp=1.05;
@@ -326,7 +329,7 @@ int main(int argc, char *argv[]){
 		}
 		if(r==0) // if first rep, store all stats
 		{
-			w_graph_all_stats(node, N_nodes, 0,  bin_exp, av_k, opt_dir);
+			w_graph_all_stats(node, N_nodes, 0,  bin_exp, av_k, opt_dir,self_opt, w_anal);
 			w_graph_node_stats_list(node,N_nodes,0, av_k, opt_dir, opt_clust, self_opt);
             char cadena[100];
             if(print_tr==1)
