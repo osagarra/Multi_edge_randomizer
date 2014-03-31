@@ -894,9 +894,9 @@ void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, doub
             fprintf(fil,"%.8f %.8f\n",pp[0][i],pp[1][i]);
         }
         fclose(fil);
-        free(pp[0]);
-        free(pp[1]);
-        free(pp);
+        //free(pp[0]);
+        //free(pp[1]);
+        //free(pp);
     }
     sout=vec_int_to_double(w,E);
     xranges=log_bins_double(0, max_value_double(wss,E) , 1.05, &xbins);

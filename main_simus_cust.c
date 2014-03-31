@@ -23,7 +23,7 @@
  *		9. Verbose (1 for on, 0 for off)
  * 		10. Clustering option (warning: Depending on av_s makes simulations orders of magnitude slower for non-sparse networks (E>>N)
  * 		11. Self-loop option (>0 for accepting them)
- *      12. Compute analytic distribution of weights? (>0 for yes, takes some time)
+ *     		12. Compute analytic distribution of weights? (>0 for yes, takes some time)
  *
  *	Output:
  *		
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
 				" *             Number of reps for averaging (int)\n"
 				" *             Verbose (1 for on, 0 for off)\n"
 				" *             Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower)\n"
-				" *             Self-loop option (>0 for accepting them) \n
+				" *             Self-loop option (>0 for accepting them) \n"
                 " *             Compute analytic distribution of weights? (>0 for yes, takes some time)\n\n"
 				"Please, read the DOCS/README file for more info!\n");
 		return 0;
