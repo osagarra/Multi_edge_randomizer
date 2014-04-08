@@ -119,7 +119,7 @@ int main(int argc, char *argv[]){
 	}
 	if((N_nodes<0)||(opt_dir<0))
 	{
- 		fprintf(stderr,	"\nCorrect usage is: ./simus N_nodes seed av_w exp xmin xmax dir_opt ensemble_opt print_opt\n\nWhere:\n\n"
+ 		fprintf(stderr,	"\nCorrect usage is: ./simus -args \n\nWhere:\n\n"
  				" *  Compulosry items:\n"
  				" *		   -N N_nodes. Number of nodes (int)\n"
  				" *        -d dir_opt. Undirected (0) or Directed (1)\n"
