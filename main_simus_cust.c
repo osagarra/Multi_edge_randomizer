@@ -3,7 +3,7 @@
  *			GENERATE Maximum entropy ensembles for networks with given <s> = T/(N-1)
  *
  *	This program generates networks (and statistics) with pre-defined strength distribution using either a
- *  macro-canonical approach (poisson and multinomial) or a canonical approach.
+ *  macro-canonical approach (poisson and multinomial) or a canonical approach or Micro-canonical approach.
  *  More details in
  * [1] O. Sagarra, C. J. Pérez Vicente, and A. Díaz-Guilera, "Statistical mechanics of multiedge networks" Phys. Rev. E 88, 062806 (2013)
  * [2] [2] The effect of fixing node strengths on multi-edge networks, Sagarra O., Font-Clos F., Pérez-Vicente C. and Díaz-Guilera, A. -arxiv: [TO BE INSERTED ]-
@@ -27,7 +27,7 @@
 " *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
 " *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
 " *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
- " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
+" *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
 "Please, read the DOCS/README file for more info!\n");
  *
  *	Output:
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]){
  				" *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
  				" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
  				" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
-                 " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
+                " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
  				"Please, read the DOCS/README file for more info!\n");
  		return 0;
  	}
