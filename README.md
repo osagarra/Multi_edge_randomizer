@@ -12,7 +12,7 @@ Details on the theory (please cite us if you use the software):
 
     http://pre.aps.org/abstract/PRE/v88/i6/e062806
 
-[2]
+[2] The effect of fixing node strengths on multi-edge networks, Sagarra O., Font-Clos F., Pérez-Vicente C. and Díaz-Guilera, A. -arxiv: [TO BE INSERTED ]-
 
 This software is distributed as it is and may be used for scientific uses only,
 please report bugs to osagarra@ub.edu.
@@ -24,6 +24,8 @@ If you do use our software, please cite us!
 
 - Just unpack the .tar package and run:
 	./compile_simus.sh for compilation (./compile_simus_mac.sh for mac users with Clang compilers).
+
+
 
 Notes:
 
@@ -39,17 +41,23 @@ Notes:
 
 ./simus_cust 
 *	Arguments:
- *		1. Number of nodes (int)
- *		2.initial seed for random generator (int)
- * 		3. Undirected (0) or Directed (1)
- * 		4. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)
- * 		5. Print adj list? 0 (no), 1 (yes)
- * 		6. file_s --> Path to file with strength sequence in form on each line: "node_num(int) s_out(int) s_in(int)\n" in the directed case, "node_num (int) s(int)\n" otherwise
- *		7. Exponent for log-binning (-1 for no log binning)
- *		8. Number of reps for averaging (int)
- *		9. Verbose (1 for on, 0 for off)
- * 		10. Clustering option (warning: Depending on av_s makes simulations orders of magnitude slower)
-*		11. Self-loop option (1 for accepting self-loops, 0 for non accepting)
+*  Compulosry items:
+*		   -N N_nodes. Number of nodes (int)
+*        -d dir_opt. Undirected (0) or Directed (1)
+*        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise
+*  Optional items:		
+*        -s seed.initial seed for random generator (int) (default=1)\n"
+*        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)
+*			(Default=2)
+*        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)
+*        -x Exponent for log-binning (-1 for no log binning) (Default=-1)
+*        -r Number of reps for averaging (int) (Default=100)
+*        -v Verbose (1 for on, 0 for off) (Default 0)
+*        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)
+*        -l Self-loop option (>0 for accepting them) (Default =1)
+*        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)
+
+"Please, read the DOCS/README file for more info!\n");
 
 
 For both cases:

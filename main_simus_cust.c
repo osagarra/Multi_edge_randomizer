@@ -6,24 +6,29 @@
  *  macro-canonical approach (poisson and multinomial) or a canonical approach.
  *  More details in
  * [1] O. Sagarra, C. J. Pérez Vicente, and A. Díaz-Guilera, "Statistical mechanics of multiedge networks" Phys. Rev. E 88, 062806 (2013)
+ * [2] [2] The effect of fixing node strengths on multi-edge networks, Sagarra O., Font-Clos F., Pérez-Vicente C. and Díaz-Guilera, A. -arxiv: [TO BE INSERTED ]-
  *
  * 
- * Author: Oleguer Sagarra, 2013.
+ * Author: Oleguer Sagarra and Francesc Font Clos, 2013.
  * 
  * 
  *	Arguments:
- *		1. Number of nodes (int)
- *		2.initial seed for random generator (int)
- * 		3. Undirected (0) or Directed (1)
- * 		4. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)
- * 		5. Print adj list? 0 (no), 1 (yes)
- * 		6. file_s --> Path to file with strength sequence in form on each line: "node_num(int) s_out(int) s_in(int)\n" in the directed case, "node_num (int) s(int)\n" otherwise
- *		7. Exponent for log-binning (-1 for no log binning)
- *		8. Number of reps for averaging (int)
- *		9. Verbose (1 for on, 0 for off)
- * 		10. Clustering option (warning: Depending on av_s makes simulations orders of magnitude slower for non-sparse networks (E>>N)
- * 		11. Self-loop option (>0 for accepting them)
- *     	12. Compute analytic distribution of weights? (>0 for yes, takes some time)
+" *  Compulosry items:\n"
+" *		   -N N_nodes. Number of nodes (int)\n"
+" *        -d dir_opt. Undirected (0) or Directed (1)\n"
+" *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
+" *  Optional items: \n"				
+" *        -s seed.initial seed for random generator (int) (default=1)\n"
+" *        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
+" *			(Default=2) \n"
+" *        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)\n"
+" *        -x Exponent for log-binning (-1 for no log binning) (Default=-1)\n"
+" *        -r Number of reps for averaging (int) (Default=100)\n"
+" *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
+" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
+" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
+ " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
+"Please, read the DOCS/README file for more info!\n");
  *
  *	Output:
  *		
@@ -53,7 +58,8 @@ int main(int argc, char *argv[]){
 	//int  	N_nodes				= atoi(argv[1]);
 	//int  	Reps				= atoi(argv[2]);
 	int  	seed      			= 1;
-	int opt_dir, N_nodes;
+	int opt_dir=-1;
+	int N_nodes=-1;
 	//int opt_dir					= atoi(argv[3]);
 	int meth					=2;
 	int print_tr				=0;
@@ -106,30 +112,32 @@ int main(int argc, char *argv[]){
 					     break;
 	             default:
 				 {
-				 		fprintf(stderr,	"\nCorrect usage is: ./simus N_nodes seed av_w exp xmin xmax dir_opt ensemble_opt print_opt\n\nWhere:\n\n"
-				 				" *  Compulosry items:\n"
-				 				" *		   -N N_nodes. Number of nodes (int)\n"
-				 				" *        -d dir_opt. Undirected (0) or Directed (1)\n"
-				 			    " *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
-				 				" *  Optional items: \n"				
-				 				" *        -s seed.initial seed for random generator (int) (default=1)\n"
-				 				" *        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
-				 				" *			(Default=2) \n"
-				 				" *        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)\n"
-				 				" *        -x Exponent for log-binning (-1 for no log binning) (Default=-1)\n"
-				 				" *        -r Number of reps for averaging (int) (Default=100)\n"
-				 				" *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
-				 				" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
-				 				" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
-				                 " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
-				 				"Please, read the DOCS/README file for more info!\n");
-				 		return 0;
-				 	}
 	                     printf("Unknown flag %c\n", ch);
 	                     exit(EXIT_FAILURE);
 	             }
 	}
-
+	}
+	if((N_nodes<0)||(opt_dir<0))
+	{
+ 		fprintf(stderr,	"\nCorrect usage is: ./simus N_nodes seed av_w exp xmin xmax dir_opt ensemble_opt print_opt\n\nWhere:\n\n"
+ 				" *  Compulosry items:\n"
+ 				" *		   -N N_nodes. Number of nodes (int)\n"
+ 				" *        -d dir_opt. Undirected (0) or Directed (1)\n"
+ 			    " *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
+ 				" *  Optional items: \n"				
+ 				" *        -s seed.initial seed for random generator (int) (default=1)\n"
+ 				" *        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
+ 				" *			(Default=2) \n"
+ 				" *        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)\n"
+ 				" *        -x Exponent for log-binning (-1 for no log binning) (Default=-1)\n"
+ 				" *        -r Number of reps for averaging (int) (Default=100)\n"
+ 				" *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
+ 				" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
+ 				" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
+                 " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
+ 				"Please, read the DOCS/README file for more info!\n");
+ 		return 0;
+ 	}
 
 	
 	/****** Check all in params are good ******/
