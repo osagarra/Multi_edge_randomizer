@@ -14,7 +14,7 @@
 #include <string.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_cblas.h>
-
+#include <unistd.h>
 
 
 typedef struct w_graph{

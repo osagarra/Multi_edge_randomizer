@@ -23,7 +23,7 @@
  *		9. Verbose (1 for on, 0 for off)
  * 		10. Clustering option (warning: Depending on av_s makes simulations orders of magnitude slower for non-sparse networks (E>>N)
  * 		11. Self-loop option (>0 for accepting them)
- *     		12. Compute analytic distribution of weights? (>0 for yes, takes some time)
+ *     	12. Compute analytic distribution of weights? (>0 for yes, takes some time)
  *
  *	Output:
  *		
@@ -42,43 +42,95 @@
 
 
 int main(int argc, char *argv[]){
-	if(argc!=13){
-		fprintf(stderr,	"\nCorrect usage is: ./simus N_nodes seed av_w exp xmin xmax dir_opt ensemble_opt print_opt\n\nWhere:\n\n"
-				" *             N_nodes. Number of nodes (int)\n"
-				" *             seed.initial seed for random generator (int)\n"
-				" *             dir_opt. Undirected (0) or Directed (1)\n"
-				" *             ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
-				" *             print_opt. Print adj list? 0 (no), 1 (yes)\n"
-				" *             file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
-				" *             Exponent for log-binning (-1 for no log binning)\n"
-				" *             Number of reps for averaging (int)\n"
-				" *             Verbose (1 for on, 0 for off)\n"
-				" *             Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower)\n"
-				" *             Self-loop option (>0 for accepting them) \n"
-                " *             Compute analytic distribution of weights? (>0 for yes, takes some time)\n\n"
-				"Please, read the DOCS/README file for more info!\n");
-		return 0;
-	}
-	
 	printf(\
 	"################################\n"
 	"########## Maximum entropy multi-edge networks ###########\n"
 	"####################################\n");
- /***********************************************************************
-	 we read the parameters and initialize the random generator	 N_nodes, Reps, Seed, s_sequence file, d_file),
- ************************************************************************/
-	int  	N_nodes				= atoi(argv[1]);
+
+/***********************************************************************
+ default params
+************************************************************************/
+	//int  	N_nodes				= atoi(argv[1]);
 	//int  	Reps				= atoi(argv[2]);
-	int  	seed      			= atoi(argv[2]);
-    int opt_dir					= atoi(argv[3]);
-    int meth					=atoi(argv[4]);
-    int print_tr				=atoi(argv[5]);
-    double bin_exp				=atof(argv[7]);
-    int reps					=atoi(argv[8]);
-	int verbose					=atoi(argv[9]);
-	int opt_clust				=atoi(argv[10]);
-	int self_opt				=atoi(argv[11]);
-    int w_anal                  =atoi(argv[12]);
+	int  	seed      			= 1;
+	int opt_dir, N_nodes;
+	//int opt_dir					= atoi(argv[3]);
+	int meth					=2;
+	int print_tr				=0;
+	double bin_exp				=-1;
+	int reps					=1000;
+	int verbose					=0;
+	int opt_clust				=0;
+	int self_opt				=1;
+	int w_anal                  =0;
+	char* file_s;
+
+	int ch;
+	        while ((ch = getopt(argc, argv, "N:s:d:e:p:f:x:r:v:c:l:w")) != -1) {
+	             switch (ch) {
+	             case 's': /* seed */
+	                     seed=atoi(optarg);
+	                     break;
+			     case 'N': /* N_nodes */
+			             N_nodes=atoi(optarg);
+			             break;
+	             case 'd': /* dir_opt */
+	                     opt_dir=atoi(optarg);
+	                     break;
+	             case 'e': /* ensemble opt */
+	                     meth=atoi(optarg);
+	                     break;
+	             case 'p': /* print opt */
+	                     print_tr=atoi(optarg);
+	                     break;
+	             case 'f': /* file strength */
+	                     file_s=optarg;
+	                     break;
+	             case 'x': /* exp */
+	                     bin_exp=atoi(optarg);
+	                     break;
+			     case 'r': /* reps */
+	                     reps=atoi(optarg);
+			             break;
+			     case 'v': /* verbose */
+			             verbose=atoi(optarg);
+			             break;
+			     case 'c': /* clust */
+			             opt_clust=atoi(optarg);
+			             break;
+			     case 'l': /* self loop */
+			             self_opt=atoi(optarg);
+			             break;
+				 case 'w': /* w_analitical */
+					 	 w_anal = atoi(optarg);
+					     break;
+	             default:
+				 {
+				 		fprintf(stderr,	"\nCorrect usage is: ./simus N_nodes seed av_w exp xmin xmax dir_opt ensemble_opt print_opt\n\nWhere:\n\n"
+				 				" *  Compulosry items:\n"
+				 				" *		   -N N_nodes. Number of nodes (int)\n"
+				 				" *        -d dir_opt. Undirected (0) or Directed (1)\n"
+				 			    " *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
+				 				" *  Optional items: \n"				
+				 				" *        -s seed.initial seed for random generator (int) (default=1)\n"
+				 				" *        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
+				 				" *			(Default=2) \n"
+				 				" *        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)\n"
+				 				" *        -x Exponent for log-binning (-1 for no log binning) (Default=-1)\n"
+				 				" *        -r Number of reps for averaging (int) (Default=100)\n"
+				 				" *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
+				 				" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
+				 				" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
+				                 " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
+				 				"Please, read the DOCS/README file for more info!\n");
+				 		return 0;
+				 	}
+	                     printf("Unknown flag %c\n", ch);
+	                     exit(EXIT_FAILURE);
+	             }
+	}
+
+
 	
 	/****** Check all in params are good ******/
 	if(bin_exp<=1) bin_exp=1.05;
@@ -138,7 +190,7 @@ int main(int argc, char *argv[]){
  ************************************************************************/ 	
 	if(opt_dir==1)
 	{
-		xx2 = read_node_list_int(argv[6], N_nodes); // strenght sequence (ints)
+		xx2 = read_node_list_int(file_s, N_nodes); // strenght sequence (ints)
 		T=sum_vec_int(xx2[0],N_nodes); // T is \sum_i s_i (for all cases)
 		if(meth!=3)
 		{
