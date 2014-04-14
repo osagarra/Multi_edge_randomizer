@@ -262,6 +262,9 @@ double ** w_graph_compute_k_analitic(w_graph* node, int N_nodes, int self_opt){
         {
             k[0][i]-=1;
             k[1][i]-=1;
+            k[0][i]-=exp(-(double)node[i].sout*((double)node[i].sin/(long double)T));
+            k[1][i]-=exp(-(double)node[i].sin*((double)node[i].sout/(long double)T));
+
         }
         for(j=0;j<N_nodes;j++)
         {
