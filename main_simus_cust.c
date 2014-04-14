@@ -64,15 +64,16 @@ int main(int argc, char *argv[]){
 	int meth					=2;
 	int print_tr				=0;
 	double bin_exp				=-1;
-	int reps					=1000;
+	int reps					=100;
 	int verbose					=0;
 	int opt_clust				=0;
 	int self_opt				=1;
 	int w_anal                  =0;
+//	int header 					=1;
 	char* file_s;
 
 	int ch;
-	        while ((ch = getopt(argc, argv, "N:s:d:e:p:f:x:r:v:c:l:w")) != -1) {
+	        while ((ch = getopt(argc, argv, "N:s:d:e:p:f:x:r:v:c:l:w:h")) != -1) {
 	             switch (ch) {
 	             case 's': /* seed */
 	                     seed=atoi(optarg);
@@ -110,6 +111,10 @@ int main(int argc, char *argv[]){
 				 case 'w': /* w_analitical */
 					 	 w_anal = atoi(optarg);
 					     break;
+//				case 'h': /* w_analitical */
+//						header = atoi(optarg);
+//						break;
+
 	             default:
 				 {
 	                     printf("Unknown flag %c\n", ch);
@@ -135,6 +140,7 @@ int main(int argc, char *argv[]){
  				" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
  				" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
                 " *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
+				//" *		   -h Number of header lines on file_s (default=1)\n\n"
  				"Please, read the DOCS/README file for more info!\n");
  		return 0;
  	}
