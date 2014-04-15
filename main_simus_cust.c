@@ -6,10 +6,11 @@
  *  macro-canonical approach (poisson and multinomial) or a canonical approach or Micro-canonical approach.
  *  More details in
  * [1] O. Sagarra, C. J. Pérez Vicente, and A. Díaz-Guilera, "Statistical mechanics of multiedge networks" Phys. Rev. E 88, 062806 (2013)
- * [2] [2] The effect of fixing node strengths on multi-edge networks, Sagarra O., Font-Clos F., Pérez-Vicente C. and Díaz-Guilera, A. -arxiv: [TO BE INSERTED ]-
+ * [2] [2] The effect of fixing node strengths on multi-edge networks, Sagarra O., Font-Clos F., Pérez-Vicente C. and Díaz-Guilera, A. 
+ *    -arxiv Pre-print: http://arxiv.org/abs/1404.3697-
  *
  * 
- * Author: Oleguer Sagarra and Francesc Font Clos, 2013.
+ * Author: Oleguer Sagarra and Francesc Font Clos, 2014.
  * 
  * 
  *	Arguments:
