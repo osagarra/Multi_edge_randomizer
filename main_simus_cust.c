@@ -13,23 +13,8 @@
  * Author: Oleguer Sagarra and Francesc Font Clos, 2014.
  * 
  * 
- *	Arguments:
-" *  Compulosry items:\n"
-" *		   -N N_nodes. Number of nodes (int)\n"
-" *        -d dir_opt. Undirected (0) or Directed (1)\n"
-" *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
-" *  Optional items: \n"				
-" *        -s seed.initial seed for random generator (int) (default=1)\n"
-" *        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
-" *			(Default=2) \n"
-" *        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)\n"
-" *        -x Exponent for log-binning (-1 for no log binning) (Default=-1)\n"
-" *        -r Number of reps for averaging (int) (Default=100)\n"
-" *        -v Verbose (1 for on, 0 for off) (Default 0)\n"
-" *        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)\n"
-" *        -l Self-loop option (>0 for accepting them) (Default =1) \n"
-" *        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)\n\n"
-"Please, read the DOCS/README file for more info!\n");
+ * Check below for information on the program or type ./simus_cust help
+ * "Please, read the DOCS/README file for more info!\n");
  *
  *	Output:
  *		
@@ -72,9 +57,8 @@ int main(int argc, char *argv[]){
 	int w_anal                  =0;
 	int header 					=1;
 	char* file_s;
-
 	int ch;
-	        while ((ch = getopt(argc, argv, "N:s:d:e:p:f:x:r:v:c:l:w:h")) != -1) {
+	        while ((ch = getopt(argc, argv, "N:s:d:e:p:f:x:r:v:c:l:w:h:")) != -1) {
 	             switch (ch) {
 	             case 's': /* seed */
 	                     seed=atoi(optarg);
@@ -112,7 +96,7 @@ int main(int argc, char *argv[]){
 				 case 'w': /* w_analitical */
 					 	 w_anal = atoi(optarg);
 					     break;
-				 case 'h': /* w_analitical */
+				 case 'h': /* header */
 				 		 header = atoi(optarg);
 						 break;
 	             default:
@@ -120,7 +104,7 @@ int main(int argc, char *argv[]){
 	                     printf("Unknown flag %c\n", ch);
 	                     exit(EXIT_FAILURE);
 	             }
-	}
+			 	}
 	}
 	if((N_nodes<0)||(opt_dir<0))
 	{
