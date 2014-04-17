@@ -41,25 +41,7 @@ Notes:
 
 1. To provide yourself the strength sequence and randomize the network using a maximum entropy approach, type:
 
-./simus_cust 
-*	Arguments:
-*  Compulosry items:
-*		   -N N_nodes. Number of nodes (int)
-*        -d dir_opt. Undirected (0) or Directed (1)
-*        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise
-*  Optional items:		
-*        -s seed.initial seed for random generator (int) (default=1)\n"
-*        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)
-*			(Default=2)
-*        -p print_opt. Print adj list? 0 (no), 1 (yes) (Default=0)
-*        -x Exponent for log-binning (-1 for no log binning) (Default=-1)
-*        -r Number of reps for averaging (int) (Default=100)
-*        -v Verbose (1 for on, 0 for off) (Default 0)
-*        -c Clustering option (1 for yes) (warning: Depending on av_s makes simulations orders of magnitude slower) (Default=0)
-*        -l Self-loop option (>0 for accepting them) (Default =1)
-*        -w Compute analytic distribution of weights? (>0 for yes, takes some time) (Default=0)
-
-"Please, read the DOCS/README file for more info!\n");
+./simus_cust help to list all the available options
 
 
 For both cases:
@@ -79,6 +61,7 @@ The file *ens_rXnode_list.list contains ensemble averages for different node fea
 
 Please note that the averages for Y2, Clustering and Average neighbor properties are performed only over realizations where the nodes exist!
 
+In the directed case, the sequence of values is first the in values and then the out values
 
 ######## Roadmap ##########
 
