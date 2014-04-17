@@ -410,7 +410,7 @@ int main(int argc, char *argv[]){
 		len=6;
 	}
 	*/
-	w_graph_all_stats_ensemble_print(acc_ensemble, len, reps, opt_dir, N_nodes,av_k);
+	w_graph_all_stats_ensemble_print(acc_ensemble, len, reps, N_nodes,av_k, opt_dir);
 	w_graph_node_stats_ensemble_print(reps, N_nodes, Tcont, node_cont, node_cont2, node_nonzero, av_k, bin_exp,len_acc_nodes, opt_dir);
 	gsl_rng_free (randgsl);
 	return 0;

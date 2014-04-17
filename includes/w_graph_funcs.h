@@ -56,7 +56,7 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 
 gsl_histogram ** w_graph_all_stats_ensemble_allocate(int dir, int s_min, int s_max, int k_min, int k_max, int w_max);
 void w_graph_all_stats_ensemble_update(gsl_histogram** acc, w_graph* node, int N_nodes, int dir);
-void w_graph_all_stats_ensemble_print(gsl_histogram** acc, int len, int reps, int dir, int N_nodes, double av_k);
+void w_graph_all_stats_ensemble_print(gsl_histogram** acc, int len, int reps, int N_nodes, double av_k, int opt_dir);
 /****************************************************************************
  * Graph algebra *
  ****************************************************************************/
