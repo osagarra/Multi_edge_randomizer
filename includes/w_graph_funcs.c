@@ -824,7 +824,8 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
     	fprintf(fil,"# Node_num\tk\tk_anal\ts\tY2\tk_nn\tk^w_nn\ts^w_nn (in) then (out) # \n");
     	for(i=0;i<N_nodes;i++)
     	{
-        	fprintf(fil,"%d %d %.3f %d %f %f %f %f %d %.3f %d %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],y2[0][i],kk_n[0][i],kkw_n[0][i],ss_n[0][i],k[1][i],k_anal[1][i],s[1][i],y2[1][i],kk_n[1][i],kkw_n[1][i],ss_n[1][i]);
+        	fprintf(fil,"%d %d %.3f %d %f %f %f %f %d %.3f %d %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],
+			y2[0][i],kk_n[0][i],kkw_n[0][i],ss_n[0][i],k[1][i],k_anal[1][i],s[1][i],y2[1][i],kk_n[1][i],kkw_n[1][i],ss_n[1][i]);
     	}
 	free_mat_double(k_anal,2);
     }else{
@@ -835,14 +836,16 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
 	    fprintf(fil,"# Node_num\tk\tk_anal\ts\tY2\tk_nn\tk^w_nn\ts^w_nn\tc\tc^w# \n");
 	    for(i=0;i<N_nodes;i++)
 	    {
-        	fprintf(fil,"%d %d %.3f %d %f %f %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],y2[0][i],kk_n[0][i],kkw_n[0][i],ss_n[0][i],c[0][i],c[1][i]);
+        	fprintf(fil,"%d %d %.3f %d %f %f %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],y2[0][i],kk_n[0][i],
+			kkw_n[0][i],ss_n[0][i],c[0][i],c[1][i]);
 	    }
 	    free_mat_double(c,2);
 	}else{
 	    fprintf(fil,"# Node_num\tk\tk_anal\ts\tY2\tk_nn\tk^w_nn\ts^w_nn\n");
 	    for(i=0;i<N_nodes;i++)
 	    {
-        	fprintf(fil,"%d %d %.3f %d %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],y2[0][i],kk_n[0][i],kkw_n[0][i],ss_n[0][i]);
+        	fprintf(fil,"%d %d %.3f %d %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],y2[0][i],kk_n[0][i],
+			kkw_n[0][i],ss_n[0][i]);
 	    }
 	free_mat_double(k_anal,2);
 	}
@@ -1020,20 +1023,6 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 	    {
 	    if(s[0][i] > 0)
 	    	{		
-		node_nonzero[i][0]+=1;
-		node_nonzero[i][1]+=1;
-		container[i][0]+=(double)k[0][i];
-		container2[i][0]+=(double)k[0][i]*k[0][i];
-		container[i][2]+=(double)s[0][i];
-		container2[i][2]+=(double)s[0][i]*s[0][i];
-		container[i][3]+=(double)y2[0][i];
-		container2[i][3]+=(double)y2[0][i]*y2[0][i];
-		container[i][4]+=(double)kk_n[0][i];
-		container2[i][4]+=(double)kk_n[0][i]*kk_n[0][i];
-		container[i][5]+=(double)kkw_n[0][i];
-		container2[i][5]+=(double)kkw_n[0][i]*kkw_n[0][i];
-		container[i][6]+=(double)ss_n[0][i];
-		container2[i][6]+=(double)ss_n[0][i]*ss_n[0][i];
 		container[i][7]+=c[0][i];
 		container2[i][7]+=c[0][i]*c[0][i];
 		container[i][8]+=c[1][i];
@@ -1041,21 +1030,19 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 	    	}
 	    }
 	    free_mat_double(c,2);
-	}else{
-	    for(i=0;i<N_nodes;i++)
-	    {
-		if(s[0][i] > 0)
-	    	{		
+	}
+	for(i=0;i<N_nodes;i++)
+	{
+	if(s[0][i] > 0)
+	    {		
 		node_nonzero[i][0]+=1;
-		node_nonzero[i][1]+=1;
 		container[i][0]+=(double)k[0][i];
 		container2[i][0]+=(double)k[0][i]*k[0][i];
 		container[i][2]+=(double)s[0][i];
 		container2[i][2]+=(double)s[0][i]*s[0][i];
 		container[i][3]+=(double)y2[0][i];
 		container2[i][3]+=(double)y2[0][i]*y2[0][i];
-
-	    	container[i][4]+=(double)kk_n[0][i];
+	    container[i][4]+=(double)kk_n[0][i];
 		container2[i][4]+=(double)kk_n[0][i]*kk_n[0][i];
 		container[i][5]+=(double)kkw_n[0][i];
 		container2[i][5]+=(double)kkw_n[0][i]*kkw_n[0][i];
@@ -1069,11 +1056,9 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 		container[i][6]+=(double)xy[2][i]; //xy
 		container2[i][6]+=(double)xy[2][i]*(double)xy[2][i];
 */
-	    	}
 	    }
-	    
 	}
-    }
+	}
     T_container[0]+=T;
     T_container[1]+=T*T;
     free_mat_int(k,2);
@@ -1094,6 +1079,7 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
     //average_matrix(cont, N_nodes, len_acc, reps);
     //average_matrix(cont2, N_nodes, len_acc, reps);
     ///// Only over existing but not for degrees or strengths!!!! ////
+	//printf("alohaaa %d\n\n",len_acc/2);fflush(stdout);
     for(i=0;i<N_nodes;i++)
     {
 	if (opt_dir==1)
@@ -1103,21 +1089,30 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 		cont[i][j]=cont[i][j]/reps;
 		cont2[i][j]=cont2[i][j]/reps;
 	    }	    
-	    for(j=len_acc/2;j<len_acc/2+3;j++)
+	    for(j=len_acc/2+1;j<len_acc/2+4;j++)
 	    {
-		cont[i][j]=cont[i][j]/node_nonzero[i][1];
-		cont2[i][j]=cont2[i][j]/node_nonzero[i][1];
+		cont[i][j]=cont[i][j]/reps;
+		cont2[i][j]=cont2[i][j]/reps;
 	    }	
 	    
-	    for(j=3;j<len_acc/2;j++)
+	    for(j=3;j<len_acc/2+1;j++)
 	    {
-		cont[i][j]=cont[i][j]/node_nonzero[i][0];
-		cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+			if(node_nonzero[i][0]>0)
+			{
+				cont[i][j]=cont[i][j]/node_nonzero[i][0];
+				cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+			}else{
+				cont[i][j]=0;
+				cont2[i][j]=0;
+			}
 	    }	    
 	    for(j=len_acc/2+4;j<len_acc;j++)
 	    {
-		cont[i][j]=cont[i][j]/node_nonzero[i][1];
-		cont2[i][j]=cont2[i][j]/node_nonzero[i][1];
+			if(node_nonzero[i][1]>0)
+			{
+				cont[i][j]=0;
+				cont2[i][j]=0;
+			}
 	    }	
 	}else{
 	    for(j=0;j<3;j++)
@@ -1127,8 +1122,14 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 	    }	    
 	    for(j=3;j<len_acc;j++)
 	    {
-		cont[i][j]=cont[i][j]/node_nonzero[i][0];
-		cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+			if(node_nonzero[i][0]>0)
+			{
+				cont[i][j]=cont[i][j]/node_nonzero[i][0];
+				cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+			}else{
+				cont[i][j]=0;
+				cont2[i][j]=0;
+			}
 	    }
 	}
     }

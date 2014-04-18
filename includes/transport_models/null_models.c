@@ -497,7 +497,7 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
             stubs_out[aux1]=i;
             aux1++;
         }
-        for(j=0;j<s[0][i];j++)
+        for(j=0;j<s[1][i];j++)
         {
             stubs_in[aux2]=i;
             aux2++;
@@ -577,6 +577,8 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
     int nulls_in,nulls_out;
     sin_mean=sout_mean=kin_mean=kout_mean=kin_std=kout_std=sin_std=sout_std=0;
     nulls_in=nulls_out=0;
+	//printf("Start read: out: %d in : %d\n",s[0][0],s[1][0]);fflush(stdout);
+	//printf("Start read: out: %d in : %d\n",node[0].sout,node[0].sin);fflush(stdout);
     for(i=0;i<N_nodes;i++)
     {
         kin_mean+=(double)node[i].kin;
