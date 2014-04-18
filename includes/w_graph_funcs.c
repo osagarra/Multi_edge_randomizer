@@ -307,8 +307,8 @@ double ** w_graph_compute_k_analitic_from_s_directed(int** s, int N_nodes, int s
             }else{
 		if(self_opt>0)
 		{
-		    k[0][i]-=exp(-(double)s[0][i]*((double)s[1][j]/(long double)T));
-		    k[1][i]-=exp(-(double)s[1][i]*((double)s[0][j]/(long double)T));
+		    k[0][i]-=exp(-(double)s[0][i]*((double)s[1][i]/(long double)T));
+		    k[1][i]-=exp(-(double)s[1][i]*((double)s[0][i]/(long double)T));
 
 		}
 	    }
@@ -359,14 +359,14 @@ double ** w_graph_compute_s_nn(w_graph* node, int N_nodes, int weight, int opt_d
         {
             if(weight>0)
             {
-                s_nn[0][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].sin; // average out-neigh, in strength
-                s_nn[1][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].sout; // average out-neigh, out
+                s_nn[1][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].sin; // average out-neigh, in strength
+                s_nn[0][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].sout; // average out-neigh, out
             }else if(weight==0){
-                s_nn[0][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].kin; // weighted degree
-                s_nn[1][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].kout; // weighted degree
+                s_nn[1][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].kin; // weighted degree
+                s_nn[0][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].kout; // weighted degree
             }else{
-                s_nn[0][i]+=(double)node[node[i].out[j]].kin; // average out-neigh, in strength
-                s_nn[1][i]+=(double)node[node[i].out[j]].kout; // average out-neigh, out                                
+                s_nn[1][i]+=(double)node[node[i].out[j]].kin; // average out-neigh, in strength
+                s_nn[0][i]+=(double)node[node[i].out[j]].kout; // average out-neigh, out                                
             }
         }
     	}
@@ -376,14 +376,14 @@ double ** w_graph_compute_s_nn(w_graph* node, int N_nodes, int weight, int opt_d
         {        
             if(weight>0)
             {
-                s_nn[2][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].sin; // average in-neigh, in
-                s_nn[3][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].sout; // average in-neigh, out
+                s_nn[3][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].sin; // average in-neigh, in
+                s_nn[2][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].sout; // average in-neigh, out
             }else if(weight==0){
-                s_nn[2][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].kin; // average in-neigh, in
-                s_nn[3][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].kout; // average in-neigh, out
+                s_nn[3][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].kin; // average in-neigh, in
+                s_nn[2][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].kout; // average in-neigh, out
             }else{
-                s_nn[2][i]+=(double)node[node[i].in[j]].kin; // average out-neigh, in strength
-                s_nn[3][i]+=(double)node[node[i].in[j]].kout; // average out-neigh, out                
+                s_nn[3][i]+=(double)node[node[i].in[j]].kin; // average out-neigh, in strength
+                s_nn[2][i]+=(double)node[node[i].in[j]].kout; // average out-neigh, out                
             }
 
         }
@@ -397,7 +397,7 @@ double ** w_graph_compute_s_nn(w_graph* node, int N_nodes, int weight, int opt_d
 	    }
 	    if((node[i].kin>0) && (opt_dir>0))
 	    {
-	    s_nn[2][i]/=(double)node[i].sin;
+	    	s_nn[2][i]/=(double)node[i].sin;
             s_nn[3][i]/=(double)node[i].sin;
 	    }
         //fprintf(prova,"%d %d %lf\n",i,node[i].sout,s_nn[0][i]);
@@ -759,9 +759,9 @@ double ** w_graph_compute_Y2(w_graph * node, int N_nodes, int opt_dir){
     double** y2=cast_mat_double(2,N_nodes);
     for(i=0;i<N_nodes;i++)
     {
+	y2[0][i]=0;
 	if(node[i].kout>0)
 	{
-        y2[0][i]=0;
 	    for(j=0;j<node[i].kout;j++)
 	    {
 	    	y2[0][i]+=((double)node[i].w_out[j])*((double)node[i].w_out[j]);
@@ -773,9 +773,9 @@ double ** w_graph_compute_Y2(w_graph * node, int N_nodes, int opt_dir){
 	    }
 	    y2[0][i]/=(((double)node[i].sout)*((double)node[i].sout));
     }
+	y2[1][i]=0;
 	if((node[i].kin>0) && (opt_dir>0))
 	{        
-        y2[1][i]=0;
 	    for(j=0;j<node[i].kin;j++)
 	    {
             	y2[1][i]+=((double)node[i].w_in[j])*((double)node[i].w_in[j]);            
@@ -821,11 +821,16 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
     if(opt_dir==1)
     {
     	double ** k_anal=w_graph_compute_k_analitic(node, N_nodes, self_opt);
-    	fprintf(fil,"# Node_num\tk\tk_anal\ts\tY2\tk_nn\tk^w_nn\ts^w_nn (in) then (out) # \n");
+		// Note for indices on s_nn:
+		// [0] -> \sum t_{ij} s_out_j / s_out_i
+		// [1] -> \sum t_{ij} s_in_j / s_out_i
+		// [2] -> \sum t_{ji} s_out_j / s_in_i
+		// [3] -> \sum t_{ji} s_in_j / s_in_i
+    	fprintf(fil,"# Node_num\tk\tk_anal\ts\tY2\tk_nn\tk^w_nn\ts^w_nn (out) then (in) # \n");
     	for(i=0;i<N_nodes;i++)
     	{
         	fprintf(fil,"%d %d %.3f %d %f %f %f %f %d %.3f %d %f %f %f %f\n",i,k[0][i],k_anal[0][i],s[0][i],
-			y2[0][i],kk_n[0][i],kkw_n[0][i],ss_n[0][i],k[1][i],k_anal[1][i],s[1][i],y2[1][i],kk_n[1][i],kkw_n[1][i],ss_n[1][i]);
+			y2[0][i],kk_n[1][i],kkw_n[1][i],ss_n[1][i],k[1][i],k_anal[1][i],s[1][i],y2[1][i],kk_n[2][i],kkw_n[2][i],ss_n[2][i]);
     	}
 	free_mat_double(k_anal,2);
     }else{
@@ -976,6 +981,12 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
     double **y2 = w_graph_compute_Y2(node, N_nodes, opt_dir); // 2 rows
     //double **xy = w_graph_compute_xy(node, N_nodes); // 2 rows
     //char cadena[100];
+		// Note for indices on s_nn:
+		// [0] -> \sum t_{ij} s_out_j / s_out_i
+		// [1] -> \sum t_{ij} s_in_j / s_out_i
+		// [2] -> \sum t_{ji} s_out_j / s_in_i
+		// [3] -> \sum t_{ji} s_in_j / s_in_i
+
     int i;
     if(opt_dir==1)
     { 
@@ -990,12 +1001,12 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 		container2[i][2]+=(double)s[0][i]*s[0][i];
 		container[i][3]+=(double)y2[0][i];
 		container2[i][3]+=(double)y2[0][i]*y2[0][i];
-		container[i][4]+=(double)kk_n[0][i];
-		container2[i][4]+=(double)kk_n[0][i]*kk_n[0][i];
-		container[i][5]+=(double)kkw_n[0][i];
-		container2[i][5]+=(double)kkw_n[0][i]*kkw_n[0][i];
-		container[i][6]+=(double)ss_n[0][i];
-		container2[i][6]+=(double)ss_n[0][i]*ss_n[0][i];
+		container[i][4]+=(double)kk_n[1][i];
+		container2[i][4]+=(double)kk_n[1][i]*kk_n[1][i];
+		container[i][5]+=(double)kkw_n[1][i];
+		container2[i][5]+=(double)kkw_n[1][i]*kkw_n[1][i];
+		container[i][6]+=(double)ss_n[1][i];
+		container2[i][6]+=(double)ss_n[1][i]*ss_n[1][i];
 
 	    }
 	    if(s[1][i] > 0)
@@ -1007,12 +1018,12 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 		container2[i][9]+=(double)s[1][i]*s[1][i];
 		container[i][10]+=(double)y2[1][i];
 		container2[i][10]+=(double)y2[1][i]*y2[1][i];
-		container[i][11]+=(double)kk_n[1][i];
-		container2[i][11]+=(double)kk_n[1][i]*kk_n[1][i];
-		container[i][12]+=(double)kkw_n[1][i];
-		container2[i][12]+=(double)kkw_n[1][i]*kkw_n[1][i];
-		container[i][13]+=(double)ss_n[1][i];
-		container2[i][13]+=(double)ss_n[1][i]*ss_n[1][i];
+		container[i][11]+=(double)kk_n[2][i];
+		container2[i][11]+=(double)kk_n[2][i]*kk_n[2][i];
+		container[i][12]+=(double)kkw_n[2][i];
+		container2[i][12]+=(double)kkw_n[2][i]*kkw_n[2][i];
+		container[i][13]+=(double)ss_n[2][i];
+		container2[i][13]+=(double)ss_n[2][i]*ss_n[2][i];
 	    }
     	}
     }else{
@@ -1143,7 +1154,7 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
     fprintf(fil,"# <T>=%f+-%f # \n",Tcont[0] ,sqrt(Tcont[1]-Tcont[0]*Tcont[0]));
     if(opt_dir==1)
     {
-    	fprintf(fil,"# Node_num\tk\tk_anal\tsset\tY2\tk_nn\tk^w_nn\ts^w_nn (in) then (out) # \n");
+    	fprintf(fil,"# Node_num\tk\tk_anal\tsset\tY2\tk_nn\tk^w_nn\ts^w_nn (out) then (in) # \n");
     }else{
 	fprintf(fil,"# Node_num\tk\tk_anal\tsset\tY2\tk_nn\tk^w_nn\ts^w_nn (optionally \tc\tc^w) # \n");
     }

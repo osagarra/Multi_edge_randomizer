@@ -608,7 +608,7 @@ void print_acc(char *input_name, gsl_histogram * acc1, gsl_histogram * acc2){
 	FILE* input=open_file("w",input_name);
 	//printf("... Printing Hist list...\n");
 	fprintf(input,"# Mean:%.4lf Std:%.4lf Norm:%.4lf Max:%.4lf Min:%.4lf Max_bin:%.4lf Min_bin:%.4lf\n",(double)gsl_histogram_mean(acc1),(double)gsl_histogram_sigma(acc1),(double)gsl_histogram_sum(acc1),(double)gsl_histogram_max_val(acc1),(double)gsl_histogram_min_val(acc1),(double) gsl_histogram_max_bin(acc1), (double)gsl_histogram_min_bin(acc1));
-	fprintf(input,"#Bin_id Bin_min Bin_max Bin_val Bin_std CDF\n");
+	fprintf(input,"#Bin_id Bin_min Bin_max Bin_val Bin_std CCDF\n");
 	int m;
 	int len=gsl_histogram_bins (acc1);
 	double bmax,bmin,bin_val;
