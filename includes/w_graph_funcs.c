@@ -274,7 +274,7 @@ double ** w_graph_compute_k_analitic(w_graph* node, int N_nodes, int self_opt){
             	if(self_opt>0)
 				{
 	                k[0][i]-=exp(-(double)node[i].sout*((double)node[j].sin/(long double)T));
-	                k[1][i]-=exp(-(double)node[i].sin*((double)node[j].sout/(long double)T));					
+	                k[1][i]-=exp(-(double)node[i].sin*((double)node[i].sout/(long double)T));					
 				}
             }
         }
@@ -1012,8 +1012,8 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 	    if(s[1][i] > 0)
 	    {
 		node_nonzero[i][1]+=1;
-		container[i][7]+=(double)k[1][i];
-		container2[i][7]+=(double)k[1][i]*k[1][i];
+		container[i][8]+=(double)k[1][i];
+		container2[i][8]+=(double)k[1][i]*k[1][i];
 		container[i][9]+=(double)s[1][i];
 		container2[i][9]+=(double)s[1][i]*s[1][i];
 		container[i][10]+=(double)y2[1][i];
@@ -1121,8 +1121,11 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 	    {
 			if(node_nonzero[i][1]>0)
 			{
-				cont[i][j]=0;
-				cont2[i][j]=0;
+				cont[i][j]=cont[i][j]/node_nonzero[i][0];
+				cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+			}else{
+				cont[i][j]=cont[i][j]/node_nonzero[i][0];
+				cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
 			}
 	    }	
 	}else{
