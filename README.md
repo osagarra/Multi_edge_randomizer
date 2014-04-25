@@ -21,6 +21,7 @@ please report bugs to osagarra@ub.edu.
 
 If you do use our software, please cite us!
 
+Additional details on the implementation can be found in the DOCS/details.pdf
 
 ############# Install ################
 
