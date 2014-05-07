@@ -110,6 +110,22 @@ void normalize_gsl_hist(gsl_histogram * hist){
     return;
 }
 
+void normalize_gsl_log_hist(gsl_histogram * hist){
+	// not tested yet //
+	int n= gsl_histogram_bins (hist);
+	int c;
+	double dx1,dx2;
+	double norm = 0.;
+	for(int i=0;i<n;i++)
+	{
+		c=gsl_histogram_get (hist, i);	
+		gsl_histogram_get_range (hist, i, &dx1, &dx2);
+		norm += (double)c*(dx2-dx1);
+	}
+    gsl_histogram_scale(hist, 1./norm);
+    return;	
+}
+
 /************ Using GSL **********/
 /****** 1 D ******/
 gsl_histogram * histogram_double(double* vect, double minx, double maxx, int nbins, int len){

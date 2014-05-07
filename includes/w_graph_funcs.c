@@ -1121,11 +1121,11 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 	    {
 			if(node_nonzero[i][1]>0)
 			{
-				cont[i][j]=cont[i][j]/node_nonzero[i][0];
-				cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+				cont[i][j]=cont[i][j]/node_nonzero[i][1];
+				cont2[i][j]=cont2[i][j]/node_nonzero[i][1];
 			}else{
-				cont[i][j]=cont[i][j]/node_nonzero[i][0];
-				cont2[i][j]=cont2[i][j]/node_nonzero[i][0];
+				cont[i][j]=0;
+				cont2[i][j]=0;
 			}
 	    }	
 	}else{
