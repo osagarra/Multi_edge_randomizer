@@ -26,7 +26,7 @@ int ** w_graph_compute_s(w_graph* node, int N_nodes);
 int ** w_graph_compute_k(w_graph* node, int N_nodes);
 double ** w_graph_compute_k_analitic(w_graph* node, int N_nodes, int self_opt);
 double ** w_graph_compute_k_analitic_from_s_directed(int** s, int N_nodes, int self_opt);
-double * w_graph_compute_k_analitic_from_s_undirected(int* s, int N_nodes, int self_opt);
+double ** w_graph_compute_k_analitic_from_s_undirected(int* s, int N_nodes, int self_opt);
 
 /******* Snn & knn's ********/
 double ** w_graph_compute_s_nn(w_graph* node, int N_nodes, int weight, int opt_dir);

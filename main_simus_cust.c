@@ -291,19 +291,19 @@ int main(int argc, char *argv[]){
 		for(i=0;i<N_nodes;i++)
 		{
 			node_cont[i][1]=k[0][i]*reps;
-			node_cont2[i][1]=k[0][i]*k[0][i]*reps;
+			node_cont2[i][1]=(k[2][i]+k[0][i]*k[0][i])*reps; // directly sigma!
 			node_cont[i][7]=k[1][i]*reps;
-			node_cont2[i][7]=k[1][i]*k[1][i]*reps;
+			node_cont2[i][7]=(k[3][i]+k[1][i]*k[1][i])*reps; // directly sigma!
 		}
-		free_mat_double(k,2);
+		free_mat_double(k,4);
 	}else{
-		double * k=w_graph_compute_k_analitic_from_s_undirected(xx,N_nodes, self_opt);
+		double ** k=w_graph_compute_k_analitic_from_s_undirected(xx,N_nodes, self_opt);
 		for(i=0;i<N_nodes;i++)
 		{
-			node_cont[i][1]=k[i]*reps;
-			node_cont2[i][1]=k[i]*k[i]*reps;
+			node_cont[i][1]=k[0][i]*reps;
+			node_cont2[i][1]=(k[1][i]+k[0][i]*k[0][i])*reps; // snd moment
 		}
-		free(k);
+		free_mat_double(k,2);
 	}
 
 	

@@ -286,17 +286,21 @@ double ** w_graph_compute_k_analitic(w_graph* node, int N_nodes, int self_opt){
 
 
 double ** w_graph_compute_k_analitic_from_s_directed(int** s, int N_nodes, int self_opt){
-    double** k=cast_mat_double(2,N_nodes);
+    double** k=cast_mat_double(4,N_nodes); // 2 firts out-in, then sigma.
     long int T=(long int)sum_vec_int(s[0],N_nodes);
     int i,j;
     for(i=0;i<N_nodes;i++)
     {
         k[0][i]=(double)N_nodes;
         k[1][i]=(double)N_nodes;
+        k[2][i]=(double)N_nodes;
+        k[3][i]=(double)N_nodes;
         if(self_opt<=0)
         {
             k[0][i]-=1;
             k[1][i]-=1;
+            k[2][i]-=1;
+            k[3][i]-=1;
         }
         for(j=0;j<N_nodes;j++)
         {
@@ -304,39 +308,54 @@ double ** w_graph_compute_k_analitic_from_s_directed(int** s, int N_nodes, int s
             {
                 k[0][i]-=exp(-(double)s[0][i]*((double)s[1][j]/(long double)T));
                 k[1][i]-=exp(-(double)s[1][i]*((double)s[0][j]/(long double)T));
+				k[2][i]-=exp(-2*(double)s[0][i]*((double)s[1][j]/(long double)T));
+				k[3][i]-=exp(-2*(double)s[1][i]*((double)s[0][j]/(long double)T));
             }else{
-		if(self_opt>0)
-		{
-		    k[0][i]-=exp(-(double)s[0][i]*((double)s[1][i]/(long double)T));
-		    k[1][i]-=exp(-(double)s[1][i]*((double)s[0][i]/(long double)T));
+				if(self_opt>0)
+				{
+		    		k[0][i]-=exp(-(double)s[0][i]*((double)s[1][i]/(long double)T));
+		    		k[1][i]-=exp(-(double)s[1][i]*((double)s[0][i]/(long double)T));
+		    		k[2][i]-=exp(-2*(double)s[0][i]*((double)s[1][i]/(long double)T));
+		    		k[3][i]-=exp(-2*(double)s[1][i]*((double)s[0][i]/(long double)T));
 
-		}
-	    }
+				}
+	    	}
         }
+		k[2][i] = k[2][i]-k[0][i]; // sigma = N- k - exp 2!
+		k[3][i] = k[3][i]-k[1][i];
     }
     return k;
 }
 
-double * w_graph_compute_k_analitic_from_s_undirected(int* s, int N_nodes, int self_opt){
-    double* k=cast_vec_double(N_nodes);
+double ** w_graph_compute_k_analitic_from_s_undirected(int* s, int N_nodes, int self_opt){
+    double** k=cast_mat_double(2,N_nodes);
     long int T=(long int)sum_vec_int(s,N_nodes);
     int i,j;
     for(i=0;i<N_nodes;i++)
     {
-        k[i]=(double)N_nodes;
-        if(self_opt<=0) k[i]-=1;
+        k[0][i]=(double)N_nodes;
+		k[1][i]=(double)N_nodes;
+        if(self_opt<=0)
+		{
+			k[0][i]-=1;		
+			k[1][i]-=1;		
+		} 
         for(j=0;j<N_nodes;j++)
         {
             if(j!=i)
             {
-                k[i]-=exp(-(double)s[i]*((double)s[j]/(long double)T));
+                k[0][i]-=exp(-(double)s[i]*((double)s[j]/(long double)T));
+                k[1][i]-=exp(-2*(double)s[i]*((double)s[j]/(long double)T));
+
             }else{
-		if(self_opt>0)
-		{
-		    k[i]-=exp(-(double)s[i]*((double)s[j]/(long double)T));
-		}
-	    }
+				if(self_opt>0)
+				{
+		    		k[0][i]-=exp(-(double)s[i]*((double)s[j]/(long double)T));
+		    		k[1][i]-=exp(-2*(double)s[i]*((double)s[j]/(long double)T));
+				}
+	    	}
         }
+		k[1][i] = k[1][i]-k[0][i];
     }
     return k;
 }
@@ -580,7 +599,7 @@ int * w_graph_compute_w(w_graph* node, int N_nodes, int* aux, int zeros){
 
 double** w_graph_compute_p_w_analitic_from_s_undirected(int maxt, double binn, int* s, int N_nodes, int self_opt, int* len){
     // computes already normalized p
-    printf("Computeing w, tmax:%d\n",maxt); fflush(stdout);
+    printf("Computing w, tmax:%d\n",maxt); fflush(stdout);
     int i,j,t,aux;
     int T=sum_vec_int(s,N_nodes);
     double norm,mu;
@@ -639,6 +658,7 @@ double** w_graph_compute_p_w_analitic_from_s_undirected(int maxt, double binn, i
 double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int** s, int N_nodes, int self_opt, int* len){
     // computes already normalized p
     //printf("Computeing w, tmax:%d\n",maxt); fflush(stdout);
+    printf("Computing w, tmax:%d\n",maxt); fflush(stdout);
     int i,j,t,aux;
     int T=sum_vec_int(s[0],N_nodes);
     double norm,mu;
@@ -924,7 +944,7 @@ void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, doub
         //free(pp);
     }
     sout=vec_int_to_double(w,E);
-    xranges=log_bins_double(0, max_value_double(wss,E) , 1.05, &xbins);
+    xranges=log_bins_double(0, max_value_double(wss,E) , bin_exp, &xbins);
     yy=y_of_x(wss, sout, xranges,  E,  xbins);
 	if(opt_dir>0)
 	{
@@ -939,7 +959,7 @@ void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, doub
     free_mat_double(yy,4);
 
     sout=vec_int_to_double(w,E);
-    xranges=log_bins_double(0, max_value_double(wkk,E) , 1.05, &xbins);
+    xranges=log_bins_double(0, max_value_double(wkk,E) , bin_exp, &xbins);
     yy=y_of_x(wkk, sout, xranges,  E,  xbins);
 	if(opt_dir>0)
 	{
