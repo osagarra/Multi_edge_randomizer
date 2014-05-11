@@ -619,9 +619,10 @@ double** w_graph_compute_p_w_analitic_from_s_undirected(int maxt, double binn, i
             norm+=1.-(double)exp(-(double)s[i]*(double)s[i]/(double)T);
         }
     }
+	aux=0;
     while(t<maxt+1)
     {
-        p[0][aux]=t;
+        p[0][aux]=(double)t;
         p[1][aux]=0;
         //fact=factorial(t);
         for(i=0;i<N_nodes;i++)
@@ -662,7 +663,7 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
     int i,j,t,aux;
     int T=sum_vec_int(s[0],N_nodes);
     double norm,mu;
-    double** p=cast_mat_double(2,N_nodes);
+    double** p=cast_mat_double(2,maxt);
     mu=0;
     norm=(double)N_nodes;
     aux=0;
@@ -680,9 +681,10 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
            norm+=1.-(double)exp(-mu);
         }
     }
+	aux=0;
     while(t<maxt+1)
     {
-        p[0][aux]=t;
+        p[0][aux]=(double)t;
         p[1][aux]=0;
         for(i=0;i<N_nodes;i++)
         {
@@ -711,8 +713,8 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
     }
     (*len)=aux;
     //printf("done\n"); fflush(stdout);
-    realloc(p[0],sizeof(double)*aux);
-    realloc(p[1],sizeof(double)*aux);
+    //realloc(p[0],sizeof(double)*aux);
+    //realloc(p[1],sizeof(double)*aux);
     return p;
 }
 
