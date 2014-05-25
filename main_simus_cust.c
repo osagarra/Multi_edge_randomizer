@@ -251,7 +251,7 @@ int main(int argc, char *argv[]){
 	//int s_min;
 	if(opt_dir==1)
 	{
-		len_acc_nodes=13; // in-out variables
+		len_acc_nodes=14; // in-out variables
 		s_max=(int)max_value_int(xx2[0],N_nodes)*5;
 		//s_min=min_value_int(xx2[1],N_nodes)/3.;
 	}else{
