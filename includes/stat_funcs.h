@@ -24,6 +24,7 @@ double * normalize_hist_int(int* hist, int len);
 gsl_histogram * histogram_double_log(double* vect, double minx, double maxx, double expo, int len);
 gsl_histogram * histogram_double(double* vect, double minx, double maxx, int nbins, int len);
 void normalize_gsl_hist(gsl_histogram * hist);
+void normalize_gsl_log_hist(gsl_histogram * hist);
 /* 2 d*/
 gsl_histogram2d * histogram_2d_double_log(double* vectx, double* vecty, double minx, double maxx, double miny, double maxy, double expx, double expy, int lenx, int leny);
 gsl_histogram2d * histogram_2d_double_linlog(double* vectx, double* vecty, double minx, double maxx, double miny, double maxy, int xbins, double expy, int lenx, int leny);

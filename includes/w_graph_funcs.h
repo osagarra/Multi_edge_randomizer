@@ -42,8 +42,11 @@ double** w_graph_compute_p_w_analitic_from_s_undirected(int maxt, double binn, i
 double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int** s, int N_nodes, int self_opt, int* len);
 double * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight);
 /******* Distances *****/
-double ** w_graph_compute_dists(w_graph* node, int N_nodes);
-
+//double ** w_graph_compute_dists(w_graph* node, int N_nodes);
+/*******  Entropies *****/
+double w_graph_entropy(w_graph* node, int N_nodes);
+void w_graph_print_entropy(double* seq,  int len,char* output);
+double w_graph_loglikelyhood(w_graph* node,int N_nodes);
 /******* All_stats *****/
 void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, int opt_dir, int opt_clust, int self_opt);
 int w_graph_total_weight( w_graph* node, int N_nodes);

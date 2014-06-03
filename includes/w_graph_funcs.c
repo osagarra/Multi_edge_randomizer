@@ -207,7 +207,7 @@ void w_graph_add_multi_link_undirected(w_graph * node, int N_nodes, int origin, 
 void w_graph_print_adj_list(w_graph* node, int N_nodes, char* output){
     int i,j;
     FILE* fil=open_file("w", output);
-    fprintf(fil,"## Adjancenncy list (directed weighted format): Node id_source Node_id target weight ##\n");fflush(stdout);
+    fprintf(fil,"## Adjancenncy list (directed weighted format): Node id_source Node_id target weight \n");fflush(stdout);
     for(i=0;i<N_nodes;i++)
     {
         for(j=0;j<node[i].kout;j++)
@@ -619,10 +619,9 @@ double** w_graph_compute_p_w_analitic_from_s_undirected(int maxt, double binn, i
             norm+=1.-(double)exp(-(double)s[i]*(double)s[i]/(double)T);
         }
     }
-	aux=0;
     while(t<maxt+1)
     {
-        p[0][aux]=(double)t;
+        p[0][aux]=t;
         p[1][aux]=0;
         //fact=factorial(t);
         for(i=0;i<N_nodes;i++)
@@ -663,7 +662,7 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
     int i,j,t,aux;
     int T=sum_vec_int(s[0],N_nodes);
     double norm,mu;
-    double** p=cast_mat_double(2,maxt);
+    double** p=cast_mat_double(2,N_nodes);
     mu=0;
     norm=(double)N_nodes;
     aux=0;
@@ -681,10 +680,9 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
            norm+=1.-(double)exp(-mu);
         }
     }
-	aux=0;
     while(t<maxt+1)
     {
-        p[0][aux]=(double)t;
+        p[0][aux]=t;
         p[1][aux]=0;
         for(i=0;i<N_nodes;i++)
         {
@@ -713,8 +711,8 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
     }
     (*len)=aux;
     //printf("done\n"); fflush(stdout);
-    //realloc(p[0],sizeof(double)*aux);
-    //realloc(p[1],sizeof(double)*aux);
+    realloc(p[0],sizeof(double)*aux);
+    realloc(p[1],sizeof(double)*aux);
     return p;
 }
 
@@ -813,7 +811,64 @@ double ** w_graph_compute_Y2(w_graph * node, int N_nodes, int opt_dir){
     return y2;
 }
 
+/****************************************************************************
+ * Entropy & LIkelyhood funcs *
+ ****************************************************************************/
+double w_graph_entropy(w_graph* node, int N_nodes){
+	double S,p;
+	int i,j,t;
+	int T = w_graph_total_weight(node,N_nodes);
+	S = 0;
+	for(i=0;i<N_nodes;i++) // all edges
+	{
+		for(j=0;j<node[i].kout;j++)
+		{
+			t = node[i].w_out[j];
+			p = (double)t/(double)T;
+			S+= p*log(p);
+		}		
+	}
+	return -S;
+}
 
+
+void w_graph_print_entropy(double* seq,int len,char* output){
+	int bins;
+	double mins,maxs,eps;
+	bins = (int)len/20.;
+	if(bins<5)
+	{
+		bins=5;
+	}else if(bins>50){
+		bins=50;
+	}
+	mins = min_value_double(seq,len);
+	maxs = max_value_double(seq,len);
+	eps = (maxs-mins)/100.;
+    gsl_histogram* h1=histogram_double(seq,mins-mins*eps,maxs+maxs*eps,bins,len);
+	print_acc(output,h1,h1);
+	return;
+}
+
+double w_graph_loglikelyhood(w_graph* node,int N_nodes){
+	double L=0;
+	int i,j,t;
+	double p,mu;
+	int T = w_graph_total_weight(node,N_nodes);
+	for(i=0;i<N_nodes;i++) // all edges
+	{
+		for(j=0;j<node[i].kout;j++)
+		{
+			t = node[i].w_out[j];
+			mu = (double)node[i].sout*(double)node[node[i].out[j]].sin/(double)T;
+			p = gsl_ran_poisson_pdf (t, mu);
+			//printf("Mu:%f p:%f t:%d",mu,p,t);fflush(stdout);
+			L+= log(p);
+		}
+				
+	}
+	return L;
+}
 /****************************************************************************
  * aLL STATS *
  ****************************************************************************/
@@ -1034,8 +1089,8 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 	    if(s[1][i] > 0)
 	    {
 		node_nonzero[i][1]+=1;
-		container[i][8]+=(double)k[1][i];
-		container2[i][8]+=(double)k[1][i]*k[1][i];
+		container[i][7]+=(double)k[1][i];
+		container2[i][7]+=(double)k[1][i]*k[1][i];
 		container[i][9]+=(double)s[1][i];
 		container2[i][9]+=(double)s[1][i]*s[1][i];
 		container[i][10]+=(double)y2[1][i];

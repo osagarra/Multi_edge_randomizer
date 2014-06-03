@@ -103,6 +103,7 @@ double * normalize_hist_int(int* hist, int len){
 	printf(" Normalizing hist ... norm=%.4f \n",check);
 	return norm_hist;
 }
+
 void normalize_gsl_hist(gsl_histogram * hist){
     double N= 1./gsl_histogram_sum(hist);
     assert(N!=0);
@@ -113,10 +114,10 @@ void normalize_gsl_hist(gsl_histogram * hist){
 void normalize_gsl_log_hist(gsl_histogram * hist){
 	// not tested yet //
 	int n= gsl_histogram_bins (hist);
-	int c;
+	int c,i;
 	double dx1,dx2;
 	double norm = 0.;
-	for(int i=0;i<n;i++)
+	for(i=0;i<n;i++)
 	{
 		c=gsl_histogram_get (hist, i);	
 		gsl_histogram_get_range (hist, i, &dx1, &dx2);

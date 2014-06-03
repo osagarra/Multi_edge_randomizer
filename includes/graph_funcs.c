@@ -44,11 +44,13 @@ double** read_distances(char *input_name, int num_nodes, int header){
   			n++;
 		}
 	}
-	if(n!=num_nodes*num_nodes && n!=num_nodes*(num_nodes+1)/2 && num_nodes*(num_nodes-1)/2){
+	/*
+	if(n!=num_nodes*num_nodes && n!=num_nodes*(num_nodes+1)/2 && n!=num_nodes*(num_nodes-1)/2){
 		int dec_nodes=(int)(-1+sqrt(4*n+1))/2;
 		printf("Check your distance list, its different (size %d, makes %d nodes) than the declared number of nodes (%d)!\n",n,dec_nodes,num_nodes);
 		//abort();
 		}
+	*/
 	printf("read %i distances...\n",n);
 	fclose(input);
 	return d;
@@ -57,8 +59,8 @@ double** read_distances(char *input_name, int num_nodes, int header){
 
 
 
-int** read_edge_list(char *input_name, int num_nodes, int header){
-	printf("reading edge list file and converting to Weighted adjacency matrix...\n");
+int** read_net_list(char *input_name, int num_nodes, int header){
+	printf("reading net (NxN) list integer file...\n");
 	FILE* input=open_file("r",input_name);
 	int** d=cast_mat_int(num_nodes,num_nodes);
 	int i,j,dij,k;
@@ -83,13 +85,48 @@ int** read_edge_list(char *input_name, int num_nodes, int header){
 		}
 		k++;
   	}
-	printf("Total num of trips %i\n",n);
+	printf("Total sum of attribute %i\n",n);
 	fclose(input);
 	return d;
 }
 
+double** read_net_list_double(char *input_name, int num_nodes, int header){
+	printf("reading net (NxN) list file with float arguments ...\n");
+	FILE* input=open_file("r",input_name);
+	double** d=cast_mat_double(num_nodes,num_nodes);
+	int i,j,k;
+	double dij;
+	double n=0;
+	char dummy[100];
+	k=0;	
+	while(k<header)
+	{
+		 fgets(dummy, 100, input);
+		 k++;
+	}
+	
+	while (!feof(input))
+	{		///we start reading	
+		if(fscanf(input, "%d %d %lf\n", &i, &j, &dij)!=3)
+		{
+			printf("error while reading\n");
+			abort();
+		}else{
+			//printf("%lf\n",dij);fflush(stdout);
+	  		d[i][j]=dij;
+	  		n+=dij;
+	  		//printf("%i",n);fflush(stdout);			
+		}
+  	}
+	printf("Total sum of attribute %lf\n",n);
+	fclose(input);
+	return d;
+}
+
+/* Bad one */
+/*
 double*** read_edge_list_double(char *input_name, int num_nodes, int header){ // check
-	printf("reading average edge list file and converting to Weighted adjacency matrix...\n");
+	printf("reading edge list file with float arguments ...\n");
 	FILE* input=open_file("r",input_name);
 	double** d=cast_mat_double(num_nodes,num_nodes);
 	double** d2=cast_mat_double(num_nodes,num_nodes);
@@ -124,11 +161,12 @@ double*** read_edge_list_double(char *input_name, int num_nodes, int header){ //
 	dtot[1]=d2;
 	return dtot;
 }
+*/
 
 /************************************/
 
 int** read_node_list_int(char *input_name,int num_nodes,int header){
-	printf("reading node attribute file...\n");
+	printf("reading node directed attribute file...\n");
 	FILE* input=open_file("r",input_name);
 	int** s=(int**)malloc(sizeof(int*)*2);
 	s[0]=(int*)malloc(sizeof(int)*num_nodes);
@@ -173,7 +211,7 @@ int** read_node_list_int(char *input_name,int num_nodes,int header){
 }
 
 int* read_node_list_int_undir(char *input_name,int num_nodes,int header){
-	printf("reading node attribute file...\n");
+	printf("reading node integer undirected attribute file...\n");
 	FILE* input=open_file("r",input_name);
 	int* s=(int*)malloc(num_nodes*sizeof(int));
 	int n,out,k;
@@ -213,7 +251,7 @@ int* read_node_list_int_undir(char *input_name,int num_nodes,int header){
 
 
 double* read_node_list_double_undir(char *input_name,int num_nodes, int header){
-	printf("reading node attribute file...\n");
+	printf("reading node undirected float attribute file...\n");
 	FILE* input=open_file("r",input_name);
 	double* s=(double*)malloc(num_nodes*sizeof(double));
 	int n,k;
@@ -256,7 +294,7 @@ double* read_node_list_double_undir(char *input_name,int num_nodes, int header){
 /************************************/
 
 double** read_node_list_double(char *input_name,int num_nodes, int header){
-	printf("reading node attribute file...\n");
+	printf("reading node float directed attribute file...\n");
 	FILE* input=open_file("r",input_name);
 	double ** s=(double**)malloc(sizeof(double*)*2);
 	s[0]=(double*)malloc(sizeof(double)*num_nodes);

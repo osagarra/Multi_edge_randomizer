@@ -24,6 +24,10 @@ w_graph* uncorrelated_poisson_multinomial_directed_graph(double* ps, double**x, 
 w_graph* uncorrelated_poisson_multinomial_undirected_graph(double* ps, double*x,  int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt);
 w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt);
 w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt);
+w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , gsl_rng* randgsl, int verbose, int self_opt, int max_reps);
+w_graph* fixedEs_poisson_directed_graph(double**x,  double lam, int N_nodes , gsl_rng* randgsl, int verbose, int self_opt, int max_reps);
+w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt);
+w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt);
 /*********Distros of p's*******/
 double * prob_mult_s_undir(double* x, int N_nodes, int self_opt);
 double * prob_mult_s_dir(double** x, int N_nodes, int self_opt);

@@ -133,26 +133,12 @@ double * flatten_matrix_triangular_double(double** w, int rows, int * length){
 	return flat_w;
 }
 
-double * flatten_matrix_double(double** w, int rows, int cols){
-	int i,j,aux;
-	double * flat_w=cast_vec_double(rows*cols);
-	aux=0;
-	for(i=0;i<rows;i++)
-	{
-		for(j=0;j<cols;j++)
-		{
-			flat_w[aux]=w[i][j];
-			aux++;
-		}
-	}
-	return flat_w;
-}
 
-int * flatten_matrix_int(int** w, int rows, int cols, int zeros, int * length){
+int * flatten_sparse_matrix_int(int** w, int rows, int cols, int zeros, int * length){
 	int i,j,aux;
 	int * flat_w=cast_vec_int(rows*cols);
 	aux=0;
-	if(zeros<0)
+	if(zeros>0)
 	{
 		for(i=0;i<rows;i++)
 		{
@@ -179,6 +165,90 @@ int * flatten_matrix_int(int** w, int rows, int cols, int zeros, int * length){
 	(*length)=aux;
 return flat_w;
 }
+
+double * flatten_sparse_matrix_double(double** w, int rows, int cols, int zeros, int * length){
+	int i,j,aux;
+	double * flat_w=cast_vec_double(rows*cols);
+	aux=0;
+	if(zeros>0)
+	{
+		for(i=0;i<rows;i++)
+		{
+			for(j=0;j<cols;j++)
+			{
+				flat_w[aux]=w[i][j];
+				aux++;
+			}
+		}
+	}else{
+		for(i=0;i<rows;i++)
+		{
+			for(j=0;j<cols;j++)
+			{
+				if(w[i][j]>0)
+				{
+					flat_w[aux]=w[i][j];
+					aux++;
+				}
+			}
+		}
+		flat_w=realloc(flat_w,aux*sizeof(double)); // realloc memory
+	}
+	(*length)=aux;
+return flat_w;
+}
+
+
+int * flatten_matrix_int(int** w, int rows, int cols, int diag, int * length){
+	int i,j,aux;
+	int * flat_w=cast_vec_int(rows*cols);
+	aux=0;
+	for(i=0;i<rows;i++)
+	{
+		for(j=0;j<cols;j++)
+		{
+			if(diag>0 || i!=j)
+			{
+				flat_w[aux]=w[i][j];
+				aux++;
+			}
+		}
+	}
+	flat_w=realloc(flat_w,aux*sizeof(int)); // realloc memory
+	(*length)=aux;
+return flat_w;
+}
+
+double * flatten_matrix_double(double** w, int rows, int cols, int diag, int * length){
+	int i,j,aux,tot;
+	double * flat_w;
+	if(diag>0)
+	{
+		tot = rows*cols;
+	}else{
+		tot = rows*cols-maxeq_int(rows,cols);
+	}
+	flat_w = cast_vec_double(tot);
+	aux=0;
+	for(i=0;i<rows;i++)
+	{
+		for(j=0;j<cols;j++)
+		{
+			if(diag>0 || i!=j)
+			{
+				flat_w[aux]=w[i][j];
+				//printf("%.15lf\n",w[i][j]); fflush(stdout);
+				aux++;
+			}
+		}
+	}
+	//flat_w=realloc(flat_w,aux*sizeof(double)); // realloc memory
+	assert(aux==tot);
+	(*length)=aux;
+return flat_w;
+}
+
+
 /********************************************************************************
  ********************************************************************************/
 double matrix_max_value_double(double** vect, int row, int col){
@@ -230,7 +300,10 @@ int matrix_min_value_int(int** vect, int row, int col){
 	}
 	return max_v;
 }
+/********************************************************************************
+ ********************************************************************************/
 
+// this is legacy code //
 void average_matrix(double** matrix, int rows, int cols, int reps){
 	int i,j;
 	for(i=0;i<rows;i++)
@@ -242,8 +315,46 @@ void average_matrix(double** matrix, int rows, int cols, int reps){
 	}
 	return;
 }
+// up to here //
+void scale_matrix(double** matrix, int rows, int cols, double reps){
+	int i,j;
+	for(i=0;i<rows;i++)
+	{
+		for(j=0;j<cols;j++)
+		{
+			matrix[i][j]=matrix[i][j]*reps;
+		}
+	}
+	return;
+}
 
+/********************************************************************************
+ ********************************************************************************/
+int sum_matrix_int(int** matrix, int rows, int cols){
+	int sum=0;
+	int i,j;
+	for(i=0;i<rows;i++)
+	{
+		for(j=0;j<cols;j++)
+		{
+			sum+=matrix[i][j];
+		}
+	}
+	return sum;
+}
 
+double sum_matrix_double(double** matrix, int rows, int cols){
+	double sum=0;
+	int i,j;
+	for(i=0;i<rows;i++)
+	{
+		for(j=0;j<cols;j++)
+		{
+			sum+=matrix[i][j];
+		}
+	}
+	return sum;
+}
 
 
 /********************************************************************************

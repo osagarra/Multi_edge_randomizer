@@ -15,8 +15,8 @@ int**    read_node_list_int(char *input_name,int num_nodes, int header);
 int* read_node_list_int_undir(char *input_name,int num_nodes, int header);
 double** read_node_list_double(char *input_name,int num_nodes, int header);
 double* read_node_list_double_undir(char *input_name,int num_nodes, int header);
-int**    read_edge_list(char *input_name, int num_nodes, int header);
-double*** read_edge_list_double(char *input_name, int num_nodes, int header);
+int**    read_net_list(char *input_name, int num_nodes, int header);
+double** read_net_list_double(char *input_name, int num_nodes, int header);
 //void write_indices(double i1, double i11, double i2, double i22, double i3, double i33, double gamma,int reps, char *output);
 /******* Print funcs ******/
 //void     print_w_2_file_double(char *input_name, int N_nodes, double **w, double **w2, double eps);
