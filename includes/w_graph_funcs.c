@@ -101,7 +101,7 @@ void w_graph_add_multi_link(w_graph * node, int N_nodes, int origin, int dest, i
         node[origin].kout++;
         if(node[origin].kout>node[origin].mem_out)
         {
-	    dummy = node[origin].mem_out;
+	    	dummy = node[origin].mem_out;
             node[origin].mem_out=dummy*2;
             node[origin].out=safe_int_realloc(node[origin].out,dummy,node[origin].mem_out,-1);
             //safe_int_realloc(node[origin].out,dummy,node[origin].mem_out);
@@ -119,7 +119,7 @@ void w_graph_add_multi_link(w_graph * node, int N_nodes, int origin, int dest, i
         node[dest].kin++;
         if(node[dest].kin>node[dest].mem_in)
         {
-	    dummy = node[dest].mem_in;
+	    	dummy = node[dest].mem_in;
             node[dest].mem_in=2*dummy;
             node[dest].in=safe_int_realloc(node[dest].in,dummy,node[dest].mem_in, -1);
             //safe_int_realloc(node[dest].in,dummy,node[dest].mem_in);
@@ -158,45 +158,43 @@ void w_graph_add_multi_link_undirected(w_graph * node, int N_nodes, int origin, 
         node[origin].kout++;
         node[origin].kin++;
 	// if not enough space, allocate more
-	if(node[origin].kout>node[origin].mem_out)
+		if(node[origin].kout>node[origin].mem_out)
         {
-	    dummy = node[origin].mem_out;
+	    	dummy = node[origin].mem_out;
             node[origin].mem_out=2*dummy;
             node[origin].out=safe_int_realloc(node[origin].out,dummy,node[origin].mem_out, -1);
             //safe_int_realloc(node[origin].out,dummy,node[origin].mem_out);
-	    //printf("lalal am here , node: %d, dest: %d, k:%d, mem:%d\n", origin, dest, node[origin].kout, node[origin].mem_out); fflush(stdout);
+	    	//printf("lalal am here , node: %d, dest: %d, k:%d, mem:%d\n", origin, dest, node[origin].kout, node[origin].mem_out); 				fflush(stdout);
             //safe_int_realloc(node[origin].w_out,dummy,node[origin].mem_out);
             node[origin].w_out=safe_int_realloc(node[origin].w_out,dummy,node[origin].mem_out, -1);
         }
 	// store neighbor
-        node[origin].out[node[origin].kout-1]=dest;
-        node[origin].w_out[node[origin].kout-1]=weight;
-
-	if(dest!=origin)
-	{
-        node[dest].kout++;
-        node[dest].kin++;
-
-	if(node[dest].kout>node[dest].mem_out)
-        {
-	    dummy = node[dest].mem_out;
-            node[dest].mem_out=2*dummy;
-            node[dest].out=safe_int_realloc(node[dest].out,dummy,node[dest].mem_out,-1);
-            //safe_int_realloc(node[dest].out,dummy,node[dest].mem_out);
-            node[dest].w_out=safe_int_realloc(node[dest].w_out,dummy,node[dest].mem_out,-1);
-            //safe_int_realloc(node[dest].w_out,dummy,node[dest].mem_out);
-        }
-	node[dest].out[node[dest].kout-1]=origin;
-        node[dest].w_out[node[dest].kout-1]=weight;
+    	node[origin].out[node[origin].kout-1]=dest;
+    	node[origin].w_out[node[origin].kout-1]=weight;
+		if(dest!=origin)
+		{
+        	node[dest].kout++;
+        	node[dest].kin++;
+			if(node[dest].kout>node[dest].mem_out)
+        	{
+	    		dummy = node[dest].mem_out;
+            	node[dest].mem_out=2*dummy;
+            	node[dest].out=safe_int_realloc(node[dest].out,dummy,node[dest].mem_out,-1);
+            	//safe_int_realloc(node[dest].out,dummy,node[dest].mem_out);
+            	node[dest].w_out=safe_int_realloc(node[dest].w_out,dummy,node[dest].mem_out,-1);
+            	//safe_int_realloc(node[dest].w_out,dummy,node[dest].mem_out);
+        	}
+			node[dest].out[node[dest].kout-1]=origin;
+        	node[dest].w_out[node[dest].kout-1]=weight;
     	}
-    }else{ // existing connection
+   }else{ // existing connection
         node[origin].w_out[neigh]+=weight;
-	if(origin!=dest)
-	{
-	    neigh=find_value_int(node[dest].out, origin, node[dest].kout);
-	    assert(neigh>=0);
-	    node[dest].w_out[neigh]+=weight;
-	}
+		if(origin!=dest)
+		{
+	    	neigh=find_value_int(node[dest].out, origin, node[dest].kout);
+	    	assert(neigh>=0);
+	    	node[dest].w_out[neigh]+=weight;
+		}
     }
     return;
 }
@@ -850,17 +848,17 @@ void w_graph_print_entropy(double* seq,int len,char* output){
 	return;
 }
 
-double w_graph_loglikelyhood(w_graph* node,int N_nodes){
+double w_graph_loglikelyhood(w_graph* node,int N_nodes,double** wij){
 	double L=0;
 	int i,j,t;
 	double p,mu;
-	int T = w_graph_total_weight(node,N_nodes);
+	//int T = w_graph_total_weight(node,N_nodes);
 	for(i=0;i<N_nodes;i++) // all edges
 	{
 		for(j=0;j<node[i].kout;j++)
 		{
 			t = node[i].w_out[j];
-			mu = (double)node[i].sout*(double)node[node[i].out[j]].sin/(double)T;
+			mu = wij[i][node[i].out[j]];
 			p = gsl_ran_poisson_pdf (t, mu);
 			//printf("Mu:%f p:%f t:%d",mu,p,t);fflush(stdout);
 			L+= log(p);
@@ -1071,6 +1069,7 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
     	{
 	    if(s[0][i] > 0)
 	    {
+		//assert(s[0][i]>=k[0][i]);
 		node_nonzero[i][0]+=1;
 		container[i][0]+=(double)k[0][i];
 		container2[i][0]+=(double)k[0][i]*k[0][i];
@@ -1088,6 +1087,7 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 	    }
 	    if(s[1][i] > 0)
 	    {
+		//assert(s[1][i]>=k[1][i]);
 		node_nonzero[i][1]+=1;
 		container[i][7]+=(double)k[1][i];
 		container2[i][7]+=(double)k[1][i]*k[1][i];
@@ -1104,38 +1104,39 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
 	    }
     	}
     }else{
-	if(opt_clust==1)
-	{
-	    double** c=w_graph_compute_clust(node, N_nodes);
-	    for(i=0;i<N_nodes;i++)
-	    {
-	    if(s[0][i] > 0)
-	    	{		
-		container[i][7]+=c[0][i];
-		container2[i][7]+=c[0][i]*c[0][i];
-		container[i][8]+=c[1][i];
-		container2[i][8]+=c[1][i]*c[1][i];
+		if(opt_clust==1)
+		{
+	    	double** c=w_graph_compute_clust(node, N_nodes);
+	    	for(i=0;i<N_nodes;i++)
+	    	{
+	    		if(s[0][i] > 0)
+	    		{		
+					container[i][7]+=c[0][i];
+					container2[i][7]+=c[0][i]*c[0][i];
+					container[i][8]+=c[1][i];
+					container2[i][8]+=c[1][i]*c[1][i];
+	    		}
 	    	}
-	    }
-	    free_mat_double(c,2);
-	}
-	for(i=0;i<N_nodes;i++)
-	{
-	if(s[0][i] > 0)
-	    {		
-		node_nonzero[i][0]+=1;
-		container[i][0]+=(double)k[0][i];
-		container2[i][0]+=(double)k[0][i]*k[0][i];
-		container[i][2]+=(double)s[0][i];
-		container2[i][2]+=(double)s[0][i]*s[0][i];
-		container[i][3]+=(double)y2[0][i];
-		container2[i][3]+=(double)y2[0][i]*y2[0][i];
-	    container[i][4]+=(double)kk_n[0][i];
-		container2[i][4]+=(double)kk_n[0][i]*kk_n[0][i];
-		container[i][5]+=(double)kkw_n[0][i];
-		container2[i][5]+=(double)kkw_n[0][i]*kkw_n[0][i];
-		container[i][6]+=(double)ss_n[0][i];
-		container2[i][6]+=(double)ss_n[0][i]*ss_n[0][i];
+	    	free_mat_double(c,2);
+		}
+		for(i=0;i<N_nodes;i++)
+		{
+			if(s[0][i] > 0)
+	    	{
+				//assert(s[0][i]>=k[0][i]);		
+				node_nonzero[i][0]+=1;
+				container[i][0]+=(double)k[0][i];
+				container2[i][0]+=(double)k[0][i]*k[0][i];
+				container[i][2]+=(double)s[0][i];
+				container2[i][2]+=(double)s[0][i]*s[0][i];
+				container[i][3]+=(double)y2[0][i];
+				container2[i][3]+=(double)y2[0][i]*y2[0][i];
+	    		container[i][4]+=(double)kk_n[0][i];
+				container2[i][4]+=(double)kk_n[0][i]*kk_n[0][i];
+				container[i][5]+=(double)kkw_n[0][i];
+				container2[i][5]+=(double)kkw_n[0][i]*kkw_n[0][i];
+				container[i][6]+=(double)ss_n[0][i];
+				container2[i][6]+=(double)ss_n[0][i]*ss_n[0][i];
 /*
 		container[i][4]+=(double)xy[0][i]; // x
 		container2[i][4]+=(double)xy[0][i]*(double)xy[0][i];
@@ -1177,13 +1178,13 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 		cont[i][j]=cont[i][j]/reps;
 		cont2[i][j]=cont2[i][j]/reps;
 	    }	    
-	    for(j=len_acc/2+1;j<len_acc/2+4;j++)
+	    for(j=len_acc/2;j<len_acc/2+3;j++)
 	    {
 		cont[i][j]=cont[i][j]/reps;
 		cont2[i][j]=cont2[i][j]/reps;
 	    }	
 	    
-	    for(j=3;j<len_acc/2+1;j++)
+	    for(j=3;j<len_acc/2;j++)
 	    {
 			if(node_nonzero[i][0]>0)
 			{
@@ -1194,7 +1195,7 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
 				cont2[i][j]=0;
 			}
 	    }	    
-	    for(j=len_acc/2+4;j<len_acc;j++)
+	    for(j=len_acc/2+3;j<len_acc;j++)
 	    {
 			if(node_nonzero[i][1]>0)
 			{
@@ -1243,6 +1244,8 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
     for(i=0;i<N_nodes;i++)
     {
         fprintf(fil,"%d",i);
+		//assert(cont[i][1]<=cont[i][2]);
+		//assert(cont[i][7]<=cont[i][9]);
     	for(j=0;j<len_acc;j++)        
     	{
 	    fprintf(fil," %f %f",cont[i][j],sqrt(cont2[i][j]-cont[i][j]*cont[i][j]));

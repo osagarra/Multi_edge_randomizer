@@ -168,6 +168,8 @@ w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_no
             nulls_out++;
         }
     }
+	assert(sin_mean==sout_mean);
+	assert(kin_mean==kout_mean);
     sout_mean/=(double)(N_nodes-nulls_out);
     sin_mean/=(double)(N_nodes-nulls_in);
     sout_std=sqrt(sout_std/(double)(N_nodes-nulls_out)-sout_mean*sout_mean);
@@ -176,7 +178,6 @@ w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_no
     kin_mean/=(double)(N_nodes-nulls_in);
     kout_std=sqrt(kout_std/(double)(N_nodes-nulls_out)-kout_mean*kout_mean);
     kin_std=sqrt(kin_std/(double)(N_nodes-nulls_in)-kin_mean*kin_mean);
-
 	if(verbose==1)
 	{
 		printf("# I generated an uncorrelated weighted net\n");
@@ -271,7 +272,7 @@ w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_
         {
             nulls_out++;
         }
-    }
+    }	
     sout_mean/=(double)(N_nodes-nulls_out);
     sout_std=sqrt(sout_std/(double)(N_nodes-nulls_out)-sout_mean*sout_mean);
     kout_mean/=(double)(N_nodes-nulls_out);
@@ -458,6 +459,8 @@ w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng*
             nulls_in++;
         }
     }
+	assert(sin_mean==sout_mean);
+	assert(kin_mean==kout_mean);
     sout_mean/=(double)(N_nodes-nulls_out);
     sin_mean/=(double)(N_nodes-nulls_in);
     sout_std=sqrt(sout_std/(double)(N_nodes-nulls_out)-sout_mean*sout_mean);
@@ -597,6 +600,8 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
             nulls_out++;
         }
     }
+	assert(sin_mean==sout_mean);
+	assert(kin_mean==kout_mean);
     sout_mean/=(double)(N_nodes-nulls_out);
     sin_mean/=(double)(N_nodes-nulls_in);
     sout_std=sqrt(sout_std/(double)(N_nodes-nulls_out)-sout_mean*sout_mean);
@@ -919,6 +924,8 @@ w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* r
             nulls_in++;
         }
     }
+	assert(sin_mean==sout_mean);
+	assert(kin_mean==kout_mean);
     sout_mean/=(double)(N_nodes-nulls_out);
     sin_mean/=(double)(N_nodes-nulls_in);
     sout_std=sqrt(sout_std/(double)(N_nodes-nulls_out)-sout_mean*sout_mean);
@@ -1124,6 +1131,8 @@ w_graph* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gs
             nulls_in++;
         }
     }
+	assert(sin_mean==sout_mean);
+	assert(kin_mean==kout_mean);
     sout_mean/=(double)(N_nodes-nulls_out);
     sin_mean/=(double)(N_nodes-nulls_in);
     sout_std=sqrt(sout_std/(double)(N_nodes-nulls_out)-sout_mean*sout_mean);
