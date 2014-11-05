@@ -12,9 +12,9 @@ Details on the theory (please cite us if you use the software):
 
     http://pre.aps.org/abstract/PRE/v88/i6/e062806
 
-[2] The effect of fixing node strengths on multi-edge networks, Sagarra O., Font-Clos F., Pérez-Vicente C. and Díaz-Guilera, A. Arxiv pre-print.
+[2] O. Sagarra, F. Font-Clos, C. J. Pérez-Vicente, and a. Díaz-Guilera, EPL (Europhysics Lett. 107, 38002 (2014).
 
-	http://arxiv.org/abs/1404.3697
+    http://iopscience.iop.org/0295-5075/107/3/38002/
 
 This software is distributed as it is and may be used for scientific uses only,
 please report bugs to osagarra@ub.edu.
