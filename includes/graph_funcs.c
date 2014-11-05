@@ -15,7 +15,7 @@
  *  Reading functions *
  ****************************************************************************/
 
-double** read_distances(char *input_name, int num_nodes, int header){
+double** read_distances(char *input_name, int num_nodes, int header, int opt_log){
 	printf("reading distance file...\n");
 	FILE* input=open_file("r",input_name);
 	int i,j,di,dj;
@@ -30,19 +30,38 @@ double** read_distances(char *input_name, int num_nodes, int header){
 		 fgets(dummy, 100, input);
 		 k++;
 	}
-	while (!feof(input))
-	{///we start reading
-		if(fscanf(input, "%d %d %lf\n", &i, &j, &dij)!=3)
-		{
-			printf("Problem in reading\n");
-			abort();
-		}else{
-			di = maxeq_int(i,j); // for distance (it is triangular)
-			dj = mineq_int(i,j); // idem
-			//printf("%i %i %lf\n",i,j,dij);fflush(stdout);
-  			d[di][dj]=dij;
-  			n++;
+	if(opt_log>0)
+	{
+		while (!feof(input))
+		{///we start reading
+			if(fscanf(input, "%d %d %lf\n", &i, &j, &dij)!=3)
+			{
+				printf("Problem in reading\n");
+				abort();
+			}else{
+				di = maxeq_int(i,j); // for distance (it is triangular)
+				dj = mineq_int(i,j); // idem
+				//printf("%i %i %lf\n",i,j,dij);fflush(stdout);
+	  			d[di][dj]=log(dij);
+	  			n++;
+			}
+		}		
+	}else{
+		while (!feof(input))
+		{///we start reading
+			if(fscanf(input, "%d %d %lf\n", &i, &j, &dij)!=3)
+			{
+				printf("Problem in reading\n");
+				abort();
+			}else{
+				di = maxeq_int(i,j); // for distance (it is triangular)
+				dj = mineq_int(i,j); // idem
+				//printf("%i %i %lf\n",i,j,dij);fflush(stdout);
+	  			d[di][dj]=dij;
+	  			n++;
+			}
 		}
+		
 	}
 	/*
 	if(n!=num_nodes*num_nodes && n!=num_nodes*(num_nodes+1)/2 && n!=num_nodes*(num_nodes-1)/2){

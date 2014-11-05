@@ -10,7 +10,7 @@
 #include "../main_simus.h"
 
 /******* Read funcs ********/
-double** read_distances(char *input_name,int num_nodes, int header);
+double** read_distances(char *input_name,int num_nodes, int header, int log_opt);
 int**    read_node_list_int(char *input_name,int num_nodes, int header);
 int* read_node_list_int_undir(char *input_name,int num_nodes, int header);
 double** read_node_list_double(char *input_name,int num_nodes, int header);

@@ -859,9 +859,12 @@ double w_graph_loglikelyhood(w_graph* node,int N_nodes,double** wij){
 		{
 			t = node[i].w_out[j];
 			mu = wij[i][node[i].out[j]];
-			p = gsl_ran_poisson_pdf (t, mu);
-			//printf("Mu:%f p:%f t:%d",mu,p,t);fflush(stdout);
-			L+= log(p);
+			if(mu>0)
+			{
+				p = gsl_ran_poisson_pdf (t, mu);
+				//printf("Mu:%f p:%f t:%d",mu,p,t);fflush(stdout);
+				L+= log(p);
+			}
 		}
 				
 	}

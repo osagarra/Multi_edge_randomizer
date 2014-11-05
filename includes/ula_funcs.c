@@ -512,7 +512,7 @@ void scale_vec_int(int* vect, int factor, int len){
     int i;
     for(i=0;i<len;i++)
     {
-        vect[i]=vect[i]*factor;
+        vect[i]=(int) (vect[i]*factor);
     }
     return;
 }
@@ -521,7 +521,7 @@ void scale_vec_double(double* vect, double factor, int len){
     int i;
     for(i=0;i<len;i++)
     {
-        vect[i]=(int) (vect[i]*factor);
+        vect[i]= vect[i]*factor;
     }
     return;
 }
