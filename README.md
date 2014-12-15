@@ -36,12 +36,12 @@ Comparing real networks with their randomized counterparts is very useful for da
 
     $ make 
 
-  The executable created is called **RandNetGen**
+  The executable created is called **MultiEdgeGen**
 
 
 ## Execution
 
-The executable is called **MultiEdgeRand**. The program has a set of options. To introduce on option you must introduce first its option key (preceded by a dash), one white space and then the argument value. The only compulsory option is the input network file (-f) in weighted adjacency list format, the number of nodes (-N) and the directed/undirected option (-d).
+The executable is called **MultiEdgeGen**. The program has a set of options. To introduce on option you must introduce first its option key (preceded by a dash), one white space and then the argument value. The only compulsory option is the input network file (-f) in weighted adjacency list format, the number of nodes (-N) and the directed/undirected option (-d).
 Arguments can appear in any order. If an argument does not appear the program gets the default value:
 
 Examples
@@ -71,7 +71,7 @@ ______________
         -h 			Number of header lines on file_s [int] (default=1)
 ```
 
-## Brief description of Random Network Generator
+## Brief description of the Multi-Edge Generator
 
 This program generates ensemble expectations of various properties for networks belonging to the ensemble of all maximum entropy multi-edge networks with prescribed strength sequence for 3 different types of ensembles.
 
@@ -96,8 +96,13 @@ Node_num k k_std k_analitic k_analitic_std s s_std Y2 Y2_std k_nn k_nn_std k^w_n
 ```
 Explicit formulas: (in latex)
 ```
-	k_i = \sum \Theta(t_ij), k^{anal}_i = \sum (1-e^{-s_is_j/T}), s_i = \sum t_{ij}, Y2 = \sum t_ij^2 / s_i
-	k_nn_i = \sum \Theta(t_{ij}) k_j / k_i, k^w_nn_i = \sum t_{ij} k_j /s_i, s^w_nn = \sum t_{ij} s_j / s_i
+	k_i = \sum \Theta(t_ij)
+	k^{anal}_i = \sum (1-e^{-s_is_j/T})
+	s_i = \sum t_{ij}
+	Y2 = \sum t_ij^2 / s_i
+	k_nn_i = \sum \Theta(t_{ij}) k_j / k_i
+	k^w_nn_i = \sum t_{ij} k_j /s_i
+	s^w_nn = \sum t_{ij} s_j / s_i
 	c = \sum_{jk} \Theta(t_ij)\Thetat(t_jk)\Theta(t_ki) / k_i(k_i-1)
 	c^w = \sum_{jk} (t_ij + t_ik) \Theta(t_ij) \Thetat(t_jk)\Theta(t_ki) / [2s_i(k_i-1)]
 ```
@@ -112,14 +117,20 @@ First for the out case, then for the in case.
 Explicit formulas (in latex):
 Out:
 ```
-	k_i^{out} = \sum_j \Theta(t_ij), k^{anal}_i^{out} = \sum_j (1-e^{-s_i^out}s_j^{in}/T}), s_i^{out} = \sum_j t_{ij}, 
+	k_i^{out} = \sum_j \Theta(t_ij)
+	k^{anal}_i^{out} = \sum_j (1-e^{-s_i^out}s_j^{in}/T})
+	s_i^{out} = \sum_j t_{ij}, 
 	Y2^{out} = \sum_j t_ij^2 / s_i^{out}
-	k_nn_i^{out} = \sum_j \Theta(t_{ij}) k_j^{in} / k_i^{out}, k^w_nn_i = \sum_j t_{ij} k_j^{in} /s_i^{out}, 
+	k_nn_i^{out} = \sum_j \Theta(t_{ij}) k_j^{in} / k_i^{out}
+	k^w_nn_i = \sum_j t_{ij} k_j^{in} /s_i^{out}, 
 	s^w_nn = \sum_j t_{ij} s_j^{in} / s_i^{out}
 In:
-	k_j^{in} = \sum_j \Theta(t_ij), k^{anal}_j = \sum_j (1-e^{-s_i^out s_j^in/T}), s_j^in = \sum_i t_{ij}, 
+	k_j^{in} = \sum_j \Theta(t_ij)
+	k^{anal}_j = \sum_j (1-e^{-s_i^out s_j^in/T})
+	s_j^in = \sum_i t_{ij}
 	Y2^{in} = \sum_i t_ij^2 / s_j^{in}
-	k_nn^{in} = \sum_i \Theta(t_{ij}) k_i^{out} / k_j^{in}, k^w_nn = \sum_i t_{ij} k_i^{out} /s_j^{in}, 
+	k_nn^{in} = \sum_i \Theta(t_{ij}) k_i^{out} / k_j^{in}
+	k^w_nn = \sum_i t_{ij} k_i^{out} /s_j^{in}, 
 	s^w_nn^{in} = \sum_i t_{ij} s_i^{out} / s_j^{in}
 ```
 Please note that the averages for Y2, Clustering and Average neighbor properties are performed only over realizations where the nodes exist (they are conditioned averages, as the case 0/0 is not defined).
@@ -139,7 +150,7 @@ bin_id bin_min bin_max Bin_count Bin_std CCDF
 ```
 For the case of a single realization, the histogram is not normalized, while for the ensemble average "ens_" file the histogram is normalized.
 
-*Example*:
+**Example**:
 
 For the out-strength distribution, for instance, 3 files are produced for 10 reps and *avs=500*:
 
