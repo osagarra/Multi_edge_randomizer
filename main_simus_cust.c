@@ -109,10 +109,10 @@ int main(int argc, char *argv[]){
 	if((N_nodes<0)||(opt_dir<0))
 	{
  		fprintf(stderr,	"\nCorrect usage is: ./simus -args \n\nWhere:\n\n"
- 				" *  Compulosry items:\n"
- 				" *		   -N N_nodes. Number of nodes (int)\n"
+ 				" *  Compulsory items:\n"
+ 				" *	       -N N_nodes. Number of nodes (int)\n"
  				" *        -d dir_opt. Undirected (0) or Directed (1)\n"
- 			    " *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise (\n"
+ 			    " *        -f file_s Path to file with strength sequence in form on each line: node_num(int) s_out(int) s_in(int) in the directed case, node_num (int) s(int) otherwise\n"
  				" *  Optional items: \n"				
  				" *        -s seed.initial seed for random generator (int) (default=1)\n"
  				" *        -e ensemble_opt. Method: 0 (canonical, multinomial), 1 (grand-canonical, poisson + multinomial), 2 (grand-canonical, poisson indep.), 3(micro-canonical)\n"
