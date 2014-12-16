@@ -96,7 +96,7 @@ int compute_T(int N_nodes, double av_k, int* x){
 /*********************************************/
 /************** Uncorrelated graphs  ********************/
 /*********************************************/
-w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
     unsigned int* ps_false;
     unsigned int dim;
     if(self_opt>0)
@@ -108,26 +108,7 @@ w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_no
     int i,j,aux;
     ps_false=(unsigned int*)malloc(sizeof(unsigned int)*dim);
     gsl_ran_multinomial(randgsl, dim,  T, ps, ps_false);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        //node[i].x=x[0][i];
-        //node[i].y=x[1][i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
 	aux=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -137,7 +118,7 @@ w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_no
             {
                 if((i!=j) || self_opt>0)
                 {
-                    w_graph_add_multi_link(node, N_nodes, i, j, ps_false[aux]);
+                    w_graph_add_multi_link(WG, N_nodes, i, j, ps_false[aux]);
                 }
             }
 			aux++;
@@ -151,19 +132,19 @@ w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_no
     nulls_in=nulls_out=0;
     for(i=0;i<N_nodes;i++)
     {
-        kin_mean+=(double)node[i].kin;
-        kin_std+=(double)node[i].kin*node[i].kin;
-        kout_mean+=(double)node[i].kout;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        sin_mean+=(double)node[i].sin;
-        sin_std+=(double)node[i].sin*node[i].sin;
-        sout_mean+=(double)node[i].sout;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        if(node[i].kin==0)
+        kin_mean+=(double)WG->node[i].kin;
+        kin_std+=(double)WG->node[i].kin*WG->node[i].kin;
+        kout_mean+=(double)WG->node[i].kout;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        sin_mean+=(double)WG->node[i].sin;
+        sin_std+=(double)WG->node[i].sin*WG->node[i].sin;
+        sout_mean+=(double)WG->node[i].sout;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].kin==0)
         {
             nulls_in++;
         }
-        if(node[i].kout==0)
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
@@ -185,19 +166,19 @@ w_graph* uncorrelated_multinomial_directed_graph(double* ps, double**x, int N_no
 		printf("# (in)  <s>=%.3lf+-%.3lf, <k>=%.3lf+-%.3lf\n",sin_mean, sin_std, kin_mean, kin_std);
 		printf("# Number of Empty nodes: (out) %d \t (in) %d \n",nulls_out,nulls_in);
 	}
-    return node;
+    return WG;
     
 }
 
 
-w_graph* uncorrelated_poisson_multinomial_directed_graph(double* ps, double**x, int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_poisson_multinomial_directed_graph(double* ps, double**x, int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
     unsigned int T_prime = gsl_ran_poisson(randgsl, T);
     if(verbose==1) printf("## Poisson sorting of T: %d\n",T_prime);
     fflush(stdout);
     return uncorrelated_multinomial_directed_graph(ps, x, N_nodes, (int)T_prime, randgsl, verbose, self_opt);
     }
 
-w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
     unsigned int* ps_false;
     unsigned int dim;
     if(self_opt>0)
@@ -212,27 +193,9 @@ w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_
     if(verbose>0) printf("## Multinomial sorting of T: %d\n",T);fflush(stdout);
     gsl_ran_multinomial(randgsl, dim,  T, ps, ps_false);
     //free(ps);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux=0;
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        //node[i].x=x[i];
-        //node[i].y=x[i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));   
-    }
+
     for(i=0;i<N_nodes;i++)
     {    
         for(j=0;j<i;j++)
@@ -241,7 +204,7 @@ w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_
             {
                 //w_graph_add_multi_link(node, N_nodes, i, j, ps_false[aux]);
                 //w_graph_add_multi_link(node, N_nodes, j, i, ps_false[aux]);
-                w_graph_add_multi_link_undirected(node, N_nodes, j, i, ps_false[aux]);
+                w_graph_add_multi_link_undirected(WG, N_nodes, j, i, ps_false[aux]);
             }
             aux++;
         }
@@ -249,7 +212,7 @@ w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_
         {
             if(ps_false[aux]>0)
             {
-                w_graph_add_multi_link_undirected(node, N_nodes, i, i, ps_false[aux]);
+                w_graph_add_multi_link_undirected(WG, N_nodes, i, i, ps_false[aux]);
                 //w_graph_add_multi_link(node, N_nodes, i, i, ps_false[aux]);
                 //w_graph_add_multi_link(node, N_nodes, i, i, ps_false[aux]);
             }
@@ -264,11 +227,11 @@ w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_
     nulls_out=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        sout_mean+=(double)node[i].sout;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        sout_mean+=(double)WG->node[i].sout;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
@@ -282,13 +245,13 @@ w_graph* uncorrelated_multinomial_undirected_graph(double* ps, double*x,  int N_
         printf("# I generated an uncorrelated weighted net\n");
 		printf("# <s>_out=%.3lf+-%.3lf, <k>_out=%.3lf+-%.3lf\n",sout_mean, sout_std, kout_mean, kout_std);
 		printf("# Number of Empty nodes: (out) %d\n",nulls_out);
-		printf("# Total Entropy S: %f\n",w_graph_entropy(node,N_nodes));
+		printf("# Total Entropy S: %f\n",w_graph_entropy(WG,N_nodes));
     }
-	return node;
+	return WG;
     
 }
 
-w_graph* uncorrelated_poisson_multinomial_undirected_graph(double* ps, double*x,  int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_poisson_multinomial_undirected_graph(double* ps, double*x,  int N_nodes , int T, gsl_rng* randgsl, int verbose, int self_opt){
     unsigned int T_prime = gsl_ran_poisson(randgsl, T);
     if(verbose==1) printf("## Poisson sorting of T: %u\n",T_prime);
     fflush(stdout);
@@ -296,7 +259,7 @@ w_graph* uncorrelated_poisson_multinomial_undirected_graph(double* ps, double*x,
     }
 
 
-w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
     //assert(N_nodes%2==0); // assert N even
     unsigned int ps_false,aux2;
     double mu;
@@ -304,28 +267,7 @@ w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng
     int flag;
     flag=0;
     double T=sum_vec_double(x,N_nodes);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        node[i].x=x[i];
-        node[i].y=x[i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-
-
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux2=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -336,7 +278,7 @@ w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng
             aux2+=ps_false;
             if(ps_false>0)
             {
-                w_graph_add_multi_link_undirected(node, N_nodes, i, j, ps_false);
+                w_graph_add_multi_link_undirected(WG, N_nodes, i, j, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, j, i, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, i, j, ps_false);
             }
@@ -349,7 +291,7 @@ w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng
             if(ps_false>0)
             {
                 flag+=ps_false;
-                w_graph_add_multi_link_undirected(node, N_nodes, i, i, ps_false);
+                w_graph_add_multi_link_undirected(WG, N_nodes, i, i, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, i, i, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, i, i, ps_false);
             }
@@ -363,11 +305,11 @@ w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng
     nulls_out=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        sout_mean+=(double)node[i].sout;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        sout_mean+=(double)WG->node[i].sout;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
@@ -382,13 +324,13 @@ w_graph* uncorrelated_poisson_undirected_graph2(double*x,  int N_nodes , gsl_rng
 		printf("# <s>_out=%.3lf+-%.3lf, <k>_out=%.3lf+-%.3lf\n",sout_mean, sout_std, kout_mean, kout_std);
 		printf("# Number of Empty nodes: (out) %d\n",nulls_out);
 		printf("# Total T:%d (original : %f) \n",aux2,T/2);
-		printf("# Total Entropy S: %f\n",w_graph_entropy(node,N_nodes));
+		printf("# Total Entropy S: %f\n",w_graph_entropy(WG,N_nodes));
 	}
-    return node;
+    return WG;
     
 }
 
-w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
     //assert(N_nodes%2==0); // assert N even
     //unsigned int* ps_false=(unsigned int*)malloc(sizeof(unsigned int)*N_nodes*(N_nodes-1)/2);
     unsigned int ps_false,aux2;
@@ -397,27 +339,7 @@ w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng*
     double T=sum_vec_double(x[0],N_nodes);
     //gsl_ran_multinomial(randgsl, N_nodes*(N_nodes-1)/2,  T, ps, ps_false);
     //free(ps);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        node[i].x=x[0][i];
-        node[i].y=x[1][i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-
-        
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux2=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -430,7 +352,7 @@ w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng*
             {
                 if(ps_false>0)
                 {
-                    w_graph_add_multi_link(node, N_nodes, i, j, ps_false);
+                    w_graph_add_multi_link(WG, N_nodes, i, j, ps_false);
                 }
             }
         }
@@ -442,19 +364,19 @@ w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng*
     nulls_out=nulls_in=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kin_mean+=(double)node[i].kin;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        kin_std+=(double)node[i].kin*node[i].kin;
-        sout_mean+=(double)node[i].sout;
-        sin_mean+=(double)node[i].sin;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        sin_std+=(double)node[i].sin*node[i].sin;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kin_mean+=(double)WG->node[i].kin;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        kin_std+=(double)WG->node[i].kin*WG->node[i].kin;
+        sout_mean+=(double)WG->node[i].sout;
+        sin_mean+=(double)WG->node[i].sin;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        sin_std+=(double)WG->node[i].sin*WG->node[i].sin;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
-        if(node[i].kin==0)
+        if(WG->node[i].kin==0)
         {
             nulls_in++;
         }
@@ -477,7 +399,7 @@ w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng*
 		printf("# Number of Empty nodes: (out) %d \t (in) %d \n",nulls_out,nulls_in);
 		printf("# Total T:%d (original: %f)\n",aux2,T/2);
 	}
-    return node;
+    return WG;
     
 }
 
@@ -485,7 +407,7 @@ w_graph* uncorrelated_poisson_directed_graph2(double**x,  int N_nodes , gsl_rng*
 
 
 
-w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
     int T=sum_vec_int(s[0], N_nodes);
     assert(sum_vec_int(s[1],N_nodes) == T);
     unsigned int* stubs_out=(unsigned int*)malloc(sizeof(unsigned int)*T);
@@ -505,26 +427,7 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
             aux2++;
         }
     }
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        node[i].x=0;
-        node[i].y=0;
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     int togo=T;
     int dest,origin;
     int e,f;
@@ -562,11 +465,11 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
         //printf("got here %d!\n",T-togo);fflush(stdout);
         if(origin!=dest)
         {
-            w_graph_add_multi_link(node, N_nodes, origin, dest, 1) ;// add edge
+            w_graph_add_multi_link(WG, N_nodes, origin, dest, 1) ;// add edge
         }else{
             if(self_opt>0)
             {
-                w_graph_add_multi_link(node, N_nodes, origin, dest, 1) ;// add edge
+                w_graph_add_multi_link(WG, N_nodes, origin, dest, 1) ;// add edge
                 flag+=1;
             }
         }
@@ -583,19 +486,19 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
 	//printf("Start read: out: %d in : %d\n",node[0].sout,node[0].sin);fflush(stdout);
     for(i=0;i<N_nodes;i++)
     {
-        kin_mean+=(double)node[i].kin;
-        kin_std+=(double)node[i].kin*node[i].kin;
-        kout_mean+=(double)node[i].kout;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        sin_mean+=(double)node[i].sin;
-        sin_std+=(double)node[i].sin*node[i].sin;
-        sout_mean+=(double)node[i].sout;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        if(node[i].sin==0)
+        kin_mean+=(double)WG->node[i].kin;
+        kin_std+=(double)WG->node[i].kin*WG->node[i].kin;
+        kout_mean+=(double)WG->node[i].kout;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        sin_mean+=(double)WG->node[i].sin;
+        sin_std+=(double)WG->node[i].sin*WG->node[i].sin;
+        sout_mean+=(double)WG->node[i].sout;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].sin==0)
         {
             nulls_in++;
         }
-        if(node[i].sout==0)
+        if(WG->node[i].sout==0)
         {
             nulls_out++;
         }
@@ -617,12 +520,12 @@ w_graph* uncorrelated_computational_directed_graph(int** s, int N_nodes , gsl_rn
 		printf("# (in)  <s>=%.3lf+-%.3lf, <k>=%.3lf+-%.3lf\n",sin_mean, sin_std, kin_mean, kin_std);
 		printf("# Number of Empty nodes: (out) %d \t (in) %d \n",nulls_out,nulls_in);
     }
-	return node;
+	return WG;
 }
 
 
 
-w_graph* uncorrelated_computational_undirected_graph(int* s, int N_nodes , gsl_rng* randgsl, int max_trials, int verbose, int self_opt){
+W_GRAPH* uncorrelated_computational_undirected_graph(int* s, int N_nodes , gsl_rng* randgsl, int max_trials, int verbose, int self_opt){
     int T=sum_vec_int(s, N_nodes);
     unsigned int* stubs_out=(unsigned int*)malloc(sizeof(unsigned int)*T);
     int i,j,aux1;
@@ -636,26 +539,7 @@ w_graph* uncorrelated_computational_undirected_graph(int* s, int N_nodes , gsl_r
             aux1++;
         }
     }
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        node[i].x=0;
-        node[i].y=0;
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     int togo=T;
     int dest,origin;
     int e,f;
@@ -714,13 +598,13 @@ w_graph* uncorrelated_computational_undirected_graph(int* s, int N_nodes , gsl_r
                 stubs_out[f]=stubs_out[togo-2];
             }
             togo-=2;
-            w_graph_add_multi_link_undirected(node, N_nodes, origin, dest, 1) ;// add edge
+            w_graph_add_multi_link_undirected(WG, N_nodes, origin, dest, 1) ;// add edge
             //w_graph_add_multi_link(node, N_nodes, dest, origin, 1) ;// add edge
             //w_graph_add_multi_link(node, N_nodes, origin, dest, 1) ;// add edge
             if((self_opt>0)&&(origin==dest))
             {
                 flag+=2;
-                w_graph_add_multi_link_undirected(node, N_nodes, origin, origin, 1) ;// add edge
+                w_graph_add_multi_link_undirected(WG, N_nodes, origin, origin, 1) ;// add edge
             }
             //aux1++;
         }
@@ -734,11 +618,11 @@ w_graph* uncorrelated_computational_undirected_graph(int* s, int N_nodes , gsl_r
     nulls_out=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=node[i].kout;
-        kout_std+=node[i].kout*node[i].kout;
-        sout_mean+=node[i].sout;
-        sout_std+=node[i].sout*node[i].sout;
-        if(node[i].sout==0)
+        kout_mean+=WG->node[i].kout;
+        kout_std+=WG->node[i].kout*WG->node[i].kout;
+        sout_mean+=WG->node[i].sout;
+        sout_std+=WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].sout==0)
         {
             nulls_out++;
         }
@@ -753,14 +637,14 @@ w_graph* uncorrelated_computational_undirected_graph(int* s, int N_nodes , gsl_r
         printf("# I generated an uncorrelated weighted net\n");
 		printf("# <s>_out=%.3lf+-%.3lf, <k>_out=%.3lf+-%.3lf\n",sout_mean, sout_std, kout_mean, kout_std);
 		printf("# Number of Empty nodes: (out) %d\n",nulls_out);
-		printf("# Total Entropy S: %f\n",w_graph_entropy(node,N_nodes));
+		printf("# Total Entropy S: %f\n",w_graph_entropy(WG,N_nodes));
 	}
-    return node;
+    return WG;
 }
 
 
 //// custom p_ij poisson //
-w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
 	// assuming pij is NOT normalized //
     //assert(N_nodes%2==0); // assert N even
     unsigned int ps_false,aux2;
@@ -769,28 +653,7 @@ w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng*
     int flag;
     flag=0;
     double T=sum_matrix_double(pij,N_nodes,N_nodes);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        //node[i].x=x[i];
-        //node[i].y=x[i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-
-
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux2=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -801,7 +664,7 @@ w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng*
             aux2+=ps_false;
             if(ps_false>0)
             {
-                w_graph_add_multi_link_undirected(node, N_nodes, i, j, ps_false);
+                w_graph_add_multi_link_undirected(WG, N_nodes, i, j, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, j, i, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, i, j, ps_false);
             }
@@ -814,7 +677,7 @@ w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng*
             if(ps_false>0)
             {
                 flag+=ps_false;
-                w_graph_add_multi_link_undirected(node, N_nodes, i, i, ps_false);
+                w_graph_add_multi_link_undirected(WG, N_nodes, i, i, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, i, i, ps_false);
                 //w_graph_add_multi_link(node, N_nodes, i, i, ps_false);
             }
@@ -828,11 +691,11 @@ w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng*
     nulls_out=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        sout_mean+=(double)node[i].sout;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        sout_mean+=(double)WG->node[i].sout;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
@@ -847,12 +710,12 @@ w_graph* custompij_poisson_undirected_graph(double**pij,  int N_nodes , gsl_rng*
 		printf("# <s>_out=%.3lf+-%.3lf, <k>_out=%.3lf+-%.3lf\n",sout_mean, sout_std, kout_mean, kout_std);
 		printf("# Number of Empty nodes: (out) %d\n",nulls_out);
 		printf("# Total T:%d (original : %f) \n",aux2,T/2);
-		printf("# Total Entropy S: %f\n",w_graph_entropy(node,N_nodes));
+		printf("# Total Entropy S: %f\n",w_graph_entropy(WG,N_nodes));
 	}
-    return node;
+    return WG;
     
 }
-w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
+W_GRAPH* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt){
 	// assuming pij is NOT normalized //
     //assert(N_nodes%2==0); // assert N even
     //unsigned int* ps_false=(unsigned int*)malloc(sizeof(unsigned int)*N_nodes*(N_nodes-1)/2);
@@ -862,27 +725,7 @@ w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* r
     double T=sum_matrix_double(pij,N_nodes,N_nodes);
     //gsl_ran_multinomial(randgsl, N_nodes*(N_nodes-1)/2,  T, ps, ps_false);
     //free(ps);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        //node[i].x=x[0][i];
-        //node[i].y=x[1][i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-
-        
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux2=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -895,7 +738,7 @@ w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* r
             {
                 if(ps_false>0)
                 {
-                    w_graph_add_multi_link(node, N_nodes, i, j, ps_false);
+                    w_graph_add_multi_link(WG, N_nodes, i, j, ps_false);
                 }
             }
         }
@@ -907,19 +750,19 @@ w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* r
     nulls_out=nulls_in=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kin_mean+=(double)node[i].kin;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        kin_std+=(double)node[i].kin*node[i].kin;
-        sout_mean+=(double)node[i].sout;
-        sin_mean+=(double)node[i].sin;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        sin_std+=(double)node[i].sin*node[i].sin;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kin_mean+=(double)WG->node[i].kin;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        kin_std+=(double)WG->node[i].kin*WG->node[i].kin;
+        sout_mean+=(double)WG->node[i].sout;
+        sin_mean+=(double)WG->node[i].sin;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        sin_std+=(double)WG->node[i].sin*WG->node[i].sin;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
-        if(node[i].kin==0)
+        if(WG->node[i].kin==0)
         {
             nulls_in++;
         }
@@ -942,14 +785,14 @@ w_graph* custompij_poisson_directed_graph(double**pij,  int N_nodes , gsl_rng* r
 		printf("# Number of Empty nodes: (out) %d \t (in) %d \n",nulls_out,nulls_in);
 		printf("# Total T:%d (original: %f)\n",aux2,T);
 	}
-    return node;
+    return WG;
     
 }
 
 
 
 //// fixedEs poisson //
-w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , gsl_rng* randgsl, int verbose, int self_opt, int max_reps){
+W_GRAPH* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , gsl_rng* randgsl, int verbose, int self_opt, int max_reps){
     //assert(N_nodes%2==0); // assert N even
     unsigned int ps_false,aux2;
     double mu,p,pij;
@@ -957,28 +800,7 @@ w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , g
     int flag;
     flag=0;
     double T=sum_vec_double(x,N_nodes);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        node[i].x=x[i];
-        node[i].y=x[i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-
-
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux2=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -997,7 +819,7 @@ w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , g
 					reps++;
 				}while(ps_false<=0  || reps<max_reps);
 	            aux2+=ps_false;
-	            w_graph_add_multi_link_undirected(node, N_nodes, i, j, ps_false);
+	            w_graph_add_multi_link_undirected(WG, N_nodes, i, j, ps_false);
 	        }				
 		}
 
@@ -1016,7 +838,7 @@ w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , g
 					reps++;
 				}while(ps_false<=0 || reps<max_reps);
 	            aux2+=ps_false;
-	            w_graph_add_multi_link_undirected(node, N_nodes, i, j, ps_false);
+	            w_graph_add_multi_link_undirected(WG, N_nodes, i, j, ps_false);
 	        }
 		}
     }
@@ -1028,11 +850,11 @@ w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , g
     nulls_out=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        sout_mean+=(double)node[i].sout;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        sout_mean+=(double)WG->node[i].sout;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
@@ -1047,12 +869,12 @@ w_graph* fixedEs_poisson_undirected_graph(double*x,  double lam, int N_nodes , g
 		printf("# <s>_out=%.3lf+-%.3lf, <k>_out=%.3lf+-%.3lf\n",sout_mean, sout_std, kout_mean, kout_std);
 		printf("# Number of Empty nodes: (out) %d\n",nulls_out);
 		printf("# Total T:%d (original : %f) \n",aux2,T/2);
-		printf("# Total Entropy S: %f\n",w_graph_entropy(node,N_nodes));
+		printf("# Total Entropy S: %f\n",w_graph_entropy(WG,N_nodes));
 	}
-    return node;
+    return WG;
     
 }
-w_graph* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt, int max_reps){
+W_GRAPH* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gsl_rng* randgsl, int verbose, int self_opt, int max_reps){
     //assert(N_nodes%2==0); // assert N even
     //unsigned int* ps_false=(unsigned int*)malloc(sizeof(unsigned int)*N_nodes*(N_nodes-1)/2);
     unsigned int ps_false,aux2,reps;
@@ -1061,27 +883,7 @@ w_graph* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gs
     double T=sum_vec_double(x[0],N_nodes);
     //gsl_ran_multinomial(randgsl, N_nodes*(N_nodes-1)/2,  T, ps, ps_false);
     //free(ps);
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
-    for(i=0;i<N_nodes;i++)
-    {
-        node[i].idnum=i;
-        node[i].x=x[0][i];
-        node[i].y=x[1][i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
-
-        
-    }
+    W_GRAPH* WG = w_graph_alloc(N_nodes);
     aux2=0;
     for(i=0;i<N_nodes;i++)
     {    
@@ -1103,7 +905,7 @@ w_graph* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gs
 	        }				
             if((i!=j) || (self_opt>0))
             {
-                w_graph_add_multi_link(node, N_nodes, i, j, ps_false);
+                w_graph_add_multi_link(WG, N_nodes, i, j, ps_false);
             }
         }
     }
@@ -1114,19 +916,19 @@ w_graph* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gs
     nulls_out=nulls_in=0;
     for(i=0;i<N_nodes;i++)
     {
-        kout_mean+=(double)node[i].kout;
-        kin_mean+=(double)node[i].kin;
-        kout_std+=(double)node[i].kout*node[i].kout;
-        kin_std+=(double)node[i].kin*node[i].kin;
-        sout_mean+=(double)node[i].sout;
-        sin_mean+=(double)node[i].sin;
-        sout_std+=(double)node[i].sout*node[i].sout;
-        sin_std+=(double)node[i].sin*node[i].sin;
-        if(node[i].kout==0)
+        kout_mean+=(double)WG->node[i].kout;
+        kin_mean+=(double)WG->node[i].kin;
+        kout_std+=(double)WG->node[i].kout*WG->node[i].kout;
+        kin_std+=(double)WG->node[i].kin*WG->node[i].kin;
+        sout_mean+=(double)WG->node[i].sout;
+        sin_mean+=(double)WG->node[i].sin;
+        sout_std+=(double)WG->node[i].sout*WG->node[i].sout;
+        sin_std+=(double)WG->node[i].sin*WG->node[i].sin;
+        if(WG->node[i].kout==0)
         {
             nulls_out++;
         }
-        if(node[i].kin==0)
+        if(WG->node[i].kin==0)
         {
             nulls_in++;
         }
@@ -1149,7 +951,7 @@ w_graph* fixedEs_poisson_directed_graph(double**x, double lam,  int N_nodes , gs
 		printf("# Number of Empty nodes: (out) %d \t (in) %d \n",nulls_out,nulls_in);
 		printf("# Total T:%d (original: %f)\n",aux2,T/2);
 	}
-    return node;
+    return WG;
     
 }
 

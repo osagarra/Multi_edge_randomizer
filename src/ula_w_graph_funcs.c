@@ -14,41 +14,43 @@
 /****************************************************************************
  * Allocation *
  ****************************************************************************/
-w_graph* w_graph_alloc(int N_nodes){
+W_GRAPH* w_graph_alloc(int N_nodes){
     int i;
-    w_graph* node = malloc(sizeof(w_graph)*N_nodes);
+    W_GRAPH* WG = (W_GRAPH*)malloc(sizeof(W_GRAPH));
+    WG->node = (NODE*)malloc(sizeof(NODE)*N_nodes);
+    WG->N_nodes = N_nodes;
     for(i=0;i<N_nodes;i++)
     {
-        node[i].idnum=i;
+        WG->node[i].idnum=i;
         //node[i].x=x[0][i];
         //node[i].y=x[1][i];
-        node[i].kin=0;
-        node[i].kout=0;
-        node[i].kout=0;
-        node[i].sin=0;
-        node[i].sout=0;
-        node[i].mem_in=1;
-        node[i].mem_out=1;
-        node[i].out=calloc(1,sizeof(int));
-        node[i].out[0]=-1;
-        node[i].in=calloc(1,sizeof(int));
-        node[i].in[0]=-1;
-        node[i].w_in=calloc(1,sizeof(int));
-        node[i].w_out=calloc(1,sizeof(int));
+        WG->node[i].kin=0;
+        WG->node[i].kout=0;
+        WG->node[i].kout=0;
+        WG->node[i].sin=0;
+        WG->node[i].sout=0;
+        WG->node[i].mem_in=1;
+        WG->node[i].mem_out=1;
+        WG->node[i].out=calloc(1,sizeof(int));
+        WG->node[i].out[0]=-1;
+        WG->node[i].in=calloc(1,sizeof(int));
+        WG->node[i].in[0]=-1;
+        WG->node[i].w_in=calloc(1,sizeof(int));
+        WG->node[i].w_out=calloc(1,sizeof(int));
     }
-    return node;
+    return WG;
 }
 
-void w_graph_free(w_graph* node, int N_nodes){
+void w_graph_free_nodes(W_GRAPH* WG, int N_nodes){
     int i;
     for(i=0;i<N_nodes;i++)
     {
-        free(node[i].out);
-        free(node[i].in);
-	free(node[i].w_out);
-	free(node[i].w_in);
+        free(WG->node[i].out);
+        free(WG->node[i].in);
+		free(WG->node[i].w_out);
+		free(WG->node[i].w_in);
     }
-    free(node);
+    free(WG->node);
     return;
 }
 
@@ -56,131 +58,128 @@ void w_graph_free(w_graph* node, int N_nodes){
  * Add edges *
  ****************************************************************************/
 /// warning: Self-loops accepted ///
-void w_graph_add_multi_link(w_graph * node, int N_nodes, int origin, int dest, int weight){
-	if(weight>0)
+void w_graph_add_multi_link(W_GRAPH * WG, int N_nodes, int origin, int dest, int weight){
+	int neigh,dummy;
+	if(weight > 0)
 	{
-    node[origin].sout+=weight;
-    node[dest].sin+=weight;
-    int neigh,dummy;
-    neigh=find_value_int(node[origin].out, dest, node[origin].kout);
-//    if(origin!=dest) // if uncomented self-loops not accepted
-//    {
-    if(neigh<0)// new connection
-    {
-        node[origin].kout++;
-        if(node[origin].kout>node[origin].mem_out)
-        {
-	    	dummy = node[origin].mem_out;
-            node[origin].mem_out=dummy*2;
-            node[origin].out=safe_int_realloc(node[origin].out,dummy,node[origin].mem_out,-1);
-            //safe_int_realloc(node[origin].out,dummy,node[origin].mem_out);
-            node[origin].w_out=safe_int_realloc(node[origin].w_out,dummy,node[origin].mem_out,-1);
-            //safe_int_realloc(node[origin].w_out,dummy,node[origin].mem_out);
-        }
-        node[origin].out[node[origin].kout-1]=dest;
-        node[origin].w_out[node[origin].kout-1]=weight;
-    }else{ // existing connection
-        node[origin].w_out[neigh]+=weight;
-    }
-    neigh=find_value_int(node[dest].in, origin, node[dest].kin);
-    if(neigh<0)// new connection
-    {
-        node[dest].kin++;
-        if(node[dest].kin>node[dest].mem_in)
-        {
-	    	dummy = node[dest].mem_in;
-            node[dest].mem_in=2*dummy;
-            node[dest].in=safe_int_realloc(node[dest].in,dummy,node[dest].mem_in, -1);
-            //safe_int_realloc(node[dest].in,dummy,node[dest].mem_in);
-            node[dest].w_in=safe_int_realloc(node[dest].w_in,dummy,node[dest].mem_in, -1);
-            //safe_int_realloc(node[dest].w_in,dummy,node[dest].mem_in);
-        }
-        node[dest].in[node[dest].kin-1]=origin;
-        node[dest].w_in[node[dest].kin-1]=weight;
-    }else{ // existing connection
-        node[dest].w_in[neigh]+=weight;
-    }
-    //if(origin==dest) printf("self-llop!");fflush(stdout);
-//    }
+		WG->node[origin].sout +=weight;
+		WG->node[dest].sin	 +=weight;
+		neigh = find_value_int(WG->node[origin].out, dest, WG->node[origin].kout);
+		if(neigh<0)// new connection
+		{
+			WG->node[origin].kout++;
+			if(WG->node[origin].kout > WG->node[origin].mem_out)
+			{
+				dummy = WG->node[origin].mem_out;
+				WG->node[origin].mem_out = dummy*2;
+				WG->node[origin].out		= safe_int_realloc(WG->node[origin].out, dummy, WG->node[origin].mem_out, -1);
+				//safe_int_realloc(WG->node[origin].out,dummy,node[origin].mem_out);
+				WG->node[origin].w_out	= safe_int_realloc(WG->node[origin].w_out, dummy, WG->node[origin].mem_out, -1);
+				//safe_int_realloc(WG->node[origin].w_out,dummy,node[origin].mem_out);
+			}
+			WG->node[origin].out[WG->node[origin].kout-1] 	= dest;
+			WG->node[origin].w_out[WG->node[origin].kout-1] 	= weight;
+		}else{ // existing connection
+			WG->node[origin].w_out[neigh]					+=	weight;
+		}
+		neigh = find_value_int(WG->node[dest].in, origin, WG->node[dest].kin);
+		if(neigh<0)// new connection
+		{
+			WG->node[dest].kin++;
+			if(WG->node[dest].kin > WG->node[dest].mem_in)
+			{
+				dummy 					= WG->node[dest].mem_in;
+				WG->node[dest].mem_in 	= 2*dummy;
+				WG->node[dest].in 		= safe_int_realloc(WG->node[dest].in, dummy, WG->node[dest].mem_in, -1);
+				//safe_int_realloc(WG->node[dest].in,dummy,node[dest].mem_in);
+				WG->node[dest].w_in 		= safe_int_realloc(WG->node[dest].w_in, dummy, WG->node[dest].mem_in, -1);
+				//safe_int_realloc(WG->node[dest].w_in,dummy,node[dest].mem_in);
+			}
+			WG->node[dest].in[WG->node[dest].kin-1]	= origin;
+			WG->node[dest].w_in[WG->node[dest].kin-1]	= weight;
+		}else{ // existing connection
+			WG->node[dest].w_in[neigh] 				+= weight;
+		}
 	}
     return;
 }
 
 
-void w_graph_add_multi_link_undirected(w_graph * node, int N_nodes, int origin, int dest, int weight){
-    // keep sin-sout for compatibility issues and add twice if self_loop
-    // update s
-    node[origin].sout+=weight;
-    node[origin].sin+=weight;
-    if(dest!=origin)
+void w_graph_add_multi_link_undirected(W_GRAPH * WG, int N_nodes, int origin, int dest, int weight){
+    if(weight > 0)
     {
-    	node[dest].sout+=weight;
-    	node[dest].sin+=weight;
-    }
-    // check new connection
-    int neigh,dummy;
-    neigh=find_value_int(node[origin].out, dest, node[origin].kout);
-//    if(origin!=dest) // if uncomented self-loops not accepted
-//    {
-    if(neigh<0)// new connection
-    {
-	// update k
-        node[origin].kout++;
-        node[origin].kin++;
-	// if not enough space, allocate more
-		if(node[origin].kout>node[origin].mem_out)
-        {
-	    	dummy = node[origin].mem_out;
-            node[origin].mem_out=2*dummy;
-            node[origin].out=safe_int_realloc(node[origin].out,dummy,node[origin].mem_out, -1);
-            //safe_int_realloc(node[origin].out,dummy,node[origin].mem_out);
-	    	//printf("lalal am here , node: %d, dest: %d, k:%d, mem:%d\n", origin, dest, node[origin].kout, node[origin].mem_out); 				fflush(stdout);
-            //safe_int_realloc(node[origin].w_out,dummy,node[origin].mem_out);
-            node[origin].w_out=safe_int_realloc(node[origin].w_out,dummy,node[origin].mem_out, -1);
-        }
-	// store neighbor
-    	node[origin].out[node[origin].kout-1]=dest;
-    	node[origin].w_out[node[origin].kout-1]=weight;
+		// keep sin-sout for compatibility issues and add twice if self_loop
+		// update s
+		WG->node[origin].sout	+= weight;
+		WG->node[origin].sin		+= weight;
 		if(dest!=origin)
 		{
-        	node[dest].kout++;
-        	node[dest].kin++;
-			if(node[dest].kout>node[dest].mem_out)
-        	{
-	    		dummy = node[dest].mem_out;
-            	node[dest].mem_out=2*dummy;
-            	node[dest].out=safe_int_realloc(node[dest].out,dummy,node[dest].mem_out,-1);
-            	//safe_int_realloc(node[dest].out,dummy,node[dest].mem_out);
-            	node[dest].w_out=safe_int_realloc(node[dest].w_out,dummy,node[dest].mem_out,-1);
-            	//safe_int_realloc(node[dest].w_out,dummy,node[dest].mem_out);
-        	}
-			node[dest].out[node[dest].kout-1]=origin;
-        	node[dest].w_out[node[dest].kout-1]=weight;
-    	}
-   }else{ // existing connection
-        node[origin].w_out[neigh]+=weight;
-		if(origin!=dest)
-		{
-	    	neigh=find_value_int(node[dest].out, origin, node[dest].kout);
-	    	assert(neigh>=0);
-	    	node[dest].w_out[neigh]+=weight;
+			WG->node[dest].sout 	+= weight;
+			WG->node[dest].sin 	+= weight;
 		}
-    }
+		// check new connection
+		int neigh,dummy;
+		neigh = find_value_int(WG->node[origin].out, dest, WG->node[origin].kout);
+		if(neigh<0)// new connection
+		{
+		// update k
+			WG->node[origin].kout++;
+			WG->node[origin].kin++;
+		// if not enough space, allocate more
+			if(WG->node[origin].kout>WG->node[origin].mem_out)
+			{
+				dummy 					= WG->node[origin].mem_out;
+				WG->node[origin].mem_out	= 2*dummy;
+				WG->node[origin].out		= safe_int_realloc(WG->node[origin].out, dummy, WG->node[origin].mem_out, -1);
+				//safe_int_realloc(WG->node[origin].out,dummy,node[origin].mem_out);
+				//printf("lalal am here , node: %d, dest: %d, k:%d, mem:%d\n", origin, dest, node[origin].kout, node[origin].mem_out); 				fflush(stdout);
+				//safe_int_realloc(WG->node[origin].w_out,dummy,node[origin].mem_out);
+				WG->node[origin].w_out	= safe_int_realloc(WG->node[origin].w_out, dummy, WG->node[origin].mem_out, -1);
+			}
+			// store neighbor
+			WG->node[origin].out[WG->node[origin].kout-1] = dest;
+			WG->node[origin].w_out[WG->node[origin].kout-1]		= weight;
+			if(dest!=origin)
+			{
+				WG->node[dest].kout++;
+				WG->node[dest].kin++;
+				if(WG->node[dest].kout > WG->node[dest].mem_out)
+				{
+					dummy 					= WG->node[dest].mem_out;
+					WG->node[dest].mem_out	= 2*dummy;
+					WG->node[dest].out		= safe_int_realloc(WG->node[dest].out, dummy, WG->node[dest].mem_out,-1);
+					//safe_int_realloc(WG->node[dest].out,dummy,node[dest].mem_out);
+					WG->node[dest].w_out		= safe_int_realloc(WG->node[dest].w_out, dummy, WG->node[dest].mem_out,-1);
+					//safe_int_realloc(WG->node[dest].w_out,dummy,node[dest].mem_out);
+				}
+				WG->node[dest].out[WG->node[dest].kout-1]   = origin;
+				WG->node[dest].w_out[WG->node[dest].kout-1] = weight;
+			}
+		}else{ // existing connection
+			WG->node[origin].w_out[neigh]   += weight;
+			if(origin != dest)
+			{
+				neigh = find_value_int(WG->node[dest].out, origin, WG->node[dest].kout);
+				assert(neigh>=0);
+				WG->node[dest].w_out[neigh] += weight;
+			}
+		}
+	}
     return;
 }
 
 /****************************************************************************
  * Printing *
  ****************************************************************************/
-void w_graph_print_adj_list(w_graph* node, int N_nodes, char* output){
+void w_graph_print_adj_list(W_GRAPH* WG, int N_nodes, char* output){
     int i,j;
     FILE* fil=open_file("w", output);
     fprintf(fil,"## Adjancenncy list (directed weighted format): Node id_source Node_id target weight \n");fflush(stdout);
     for(i=0;i<N_nodes;i++)
     {
-        for(j=0;j<node[i].kout;j++)
+        for(j=0;j<WG->node[i].kout;j++)
         {
-            fprintf(fil,"%d %d %d\n",node[i].idnum,node[node[i].out[j]].idnum,node[i].w_out[j]);
+            fprintf(fil,"%d %d %d\n",WG->node[i].idnum, WG->node[WG->node[i].out[j]].idnum, WG->node[i].w_out[j]);
         }
     }
     fclose(fil);    
@@ -190,36 +189,33 @@ void w_graph_print_adj_list(w_graph* node, int N_nodes, char* output){
  * S and K's *
  ****************************************************************************/
 
-int ** w_graph_compute_s(w_graph* node, int N_nodes){
+int ** w_graph_compute_s(W_GRAPH* WG, int N_nodes){
     int** s=cast_mat_int(2,N_nodes);
     int i;
     for(i=0;i<N_nodes;i++)
     {
-        s[0][i]=node[i].sout;
-        s[1][i]=node[i].sin;
+        s[0][i] = WG->node[i].sout;
+        s[1][i] = WG->node[i].sin;
     }
     return s;
 }
 
 
-
-
-
-int ** w_graph_compute_k(w_graph* node, int N_nodes){
+int ** w_graph_compute_k(W_GRAPH* WG, int N_nodes){
     int** k=cast_mat_int(2,N_nodes);
     int i;
     for(i=0;i<N_nodes;i++)
     {
-        k[0][i]=node[i].kout;
-        k[1][i]=node[i].kin;
+        k[0][i]=WG->node[i].kout;
+        k[1][i]=WG->node[i].kin;
     }
     return k;
 }
 
 
-double ** w_graph_compute_k_analitic(w_graph* node, int N_nodes, int self_opt){
+double ** w_graph_compute_k_analitic(W_GRAPH* WG, int N_nodes, int self_opt){
     double** k=cast_mat_double(2,N_nodes);
-    int **s=w_graph_compute_s(node, N_nodes);
+    int **s=w_graph_compute_s(WG, N_nodes);
     long int T=sum_vec_int(s[0],N_nodes);
     int i,j;
     for(i=0;i<N_nodes;i++)
@@ -236,13 +232,13 @@ double ** w_graph_compute_k_analitic(w_graph* node, int N_nodes, int self_opt){
         {
             if(j!=i)
             {
-                k[0][i]-=exp(-(double)node[i].sout*((double)node[j].sin/(long double)T));
-                k[1][i]-=exp(-(double)node[i].sin*((double)node[j].sout/(long double)T));
+                k[0][i]-=exp(-(double)WG->node[i].sout*((double)WG->node[j].sin/(long double)T));
+                k[1][i]-=exp(-(double)WG->node[i].sin*((double)WG->node[j].sout/(long double)T));
             }else{
             	if(self_opt>0)
 				{
-	                k[0][i]-=exp(-(double)node[i].sout*((double)node[j].sin/(long double)T));
-	                k[1][i]-=exp(-(double)node[i].sin*((double)node[i].sout/(long double)T));					
+	                k[0][i]-=exp(-(double)WG->node[i].sout*((double)WG->node[j].sin/(long double)T));
+	                k[1][i]-=exp(-(double)WG->node[i].sin*((double)WG->node[i].sout/(long double)T));					
 				}
             }
         }
@@ -333,71 +329,71 @@ double ** w_graph_compute_k_analitic_from_s_undirected(int* s, int N_nodes, int 
 /****************************************************************************
  * Snn and Knn's *
  ****************************************************************************/
-double ** w_graph_compute_s_nn(w_graph* node, int N_nodes, int weight, int opt_dir){
+double ** w_graph_compute_s_nn(W_GRAPH* WG, int N_nodes, int weight, int opt_dir){
     double ** s_nn=cast_mat_double(4, N_nodes);
     int i,j;
     //FILE* prova=open_file("a","check.dat");
     for(i=0;i<N_nodes;i++)
     {
         s_nn[0][i]=s_nn[1][i]=s_nn[2][i]=s_nn[3][i]=0;
-        if(node[i].kout>0)
+        if(WG->node[i].kout>0)
 	{
-	for(j=0;j<node[i].kout;j++)
+	for(j=0;j<WG->node[i].kout;j++)
         {
             if(weight>0)
             {
-                s_nn[1][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].sin; // average out-neigh, in strength
-                s_nn[0][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].sout; // average out-neigh, out
+                s_nn[1][i]+=(double)(WG->node[i].w_out[j])*(double)WG->node[WG->node[i].out[j]].sin; // average out-neigh, in strength
+                s_nn[0][i]+=(double)(WG->node[i].w_out[j])*(double)WG->node[WG->node[i].out[j]].sout; // average out-neigh, out
             }else if(weight==0){
-                s_nn[1][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].kin; // weighted degree
-                s_nn[0][i]+=(double)(node[i].w_out[j])*(double)node[node[i].out[j]].kout; // weighted degree
+                s_nn[1][i]+=(double)(WG->node[i].w_out[j])*(double)WG->node[WG->node[i].out[j]].kin; // weighted degree
+                s_nn[0][i]+=(double)(WG->node[i].w_out[j])*(double)WG->node[WG->node[i].out[j]].kout; // weighted degree
             }else{
-                s_nn[1][i]+=(double)node[node[i].out[j]].kin; // average out-neigh, in strength
-                s_nn[0][i]+=(double)node[node[i].out[j]].kout; // average out-neigh, out                                
+                s_nn[1][i]+=(double)WG->node[WG->node[i].out[j]].kin; // average out-neigh, in strength
+                s_nn[0][i]+=(double)WG->node[WG->node[i].out[j]].kout; // average out-neigh, out                                
             }
         }
     	}
-	if((node[i].kin>0) && (opt_dir>0))
+	if((WG->node[i].kin>0) && (opt_dir>0))
 	{
-        for(j=0;j<node[i].kin;j++)
+        for(j=0;j<WG->node[i].kin;j++)
         {        
             if(weight>0)
             {
-                s_nn[3][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].sin; // average in-neigh, in
-                s_nn[2][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].sout; // average in-neigh, out
+                s_nn[3][i]+=WG->node[i].w_in[j]*(double)WG->node[WG->node[i].in[j]].sin; // average in-neigh, in
+                s_nn[2][i]+=WG->node[i].w_in[j]*(double)WG->node[WG->node[i].in[j]].sout; // average in-neigh, out
             }else if(weight==0){
-                s_nn[3][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].kin; // average in-neigh, in
-                s_nn[2][i]+=node[i].w_in[j]*(double)node[node[i].in[j]].kout; // average in-neigh, out
+                s_nn[3][i]+=WG->node[i].w_in[j]*(double)WG->node[WG->node[i].in[j]].kin; // average in-neigh, in
+                s_nn[2][i]+=WG->node[i].w_in[j]*(double)WG->node[WG->node[i].in[j]].kout; // average in-neigh, out
             }else{
-                s_nn[3][i]+=(double)node[node[i].in[j]].kin; // average out-neigh, in strength
-                s_nn[2][i]+=(double)node[node[i].in[j]].kout; // average out-neigh, out                
+                s_nn[3][i]+=(double)WG->node[WG->node[i].in[j]].kin; // average out-neigh, in strength
+                s_nn[2][i]+=(double)WG->node[WG->node[i].in[j]].kout; // average out-neigh, out                
             }
 
         }
 	}
         if(weight>=0)
         {
-	    if(node[i].kout>0)
+	    if(WG->node[i].kout>0)
 	    {
-            s_nn[0][i]/=(double)node[i].sout;
-            s_nn[1][i]/=(double)node[i].sout;
+            s_nn[0][i]/=(double)WG->node[i].sout;
+            s_nn[1][i]/=(double)WG->node[i].sout;
 	    }
-	    if((node[i].kin>0) && (opt_dir>0))
+	    if((WG->node[i].kin>0) && (opt_dir>0))
 	    {
-	    	s_nn[2][i]/=(double)node[i].sin;
-            s_nn[3][i]/=(double)node[i].sin;
+	    	s_nn[2][i]/=(double)WG->node[i].sin;
+            s_nn[3][i]/=(double)WG->node[i].sin;
 	    }
         //fprintf(prova,"%d %d %lf\n",i,node[i].sout,s_nn[0][i]);
         }else{
-	    if(node[i].kout>0)
+	    if(WG->node[i].kout>0)
 	    {
-            s_nn[0][i]/=(double)node[i].kout;
-            s_nn[1][i]/=(double)node[i].kout;
+            s_nn[0][i]/=(double)WG->node[i].kout;
+            s_nn[1][i]/=(double)WG->node[i].kout;
 	    }
-	    if((node[i].kin>0) && (opt_dir>0))
+	    if((WG->node[i].kin>0) && (opt_dir>0))
 	    {
-            s_nn[2][i]/=(double)node[i].kin;
-            s_nn[3][i]/=(double)node[i].kin;                
+            s_nn[2][i]/=(double)WG->node[i].kin;
+            s_nn[3][i]/=(double)WG->node[i].kin;                
 	    }
         }
     }
@@ -409,7 +405,7 @@ double ** w_graph_compute_s_nn(w_graph* node, int N_nodes, int weight, int opt_d
  * Clustering *
  ****************************************************************************/
 
-double ** w_graph_compute_clust(w_graph * node, int N_nodes){ // 2 cols: unweighted, weighted
+double ** w_graph_compute_clust(W_GRAPH * WG, int N_nodes){ // 2 cols: unweighted, weighted
     //printf("#### Computing c ####\n"); fflush(stdout);
     int i,j,k,l;
     int c_glo, c_glo_den,e;
@@ -419,39 +415,39 @@ double ** w_graph_compute_clust(w_graph * node, int N_nodes){ // 2 cols: unweigh
     ///for per cada node i
     for(i=0;i<N_nodes;++i)
     {
-	if(node[i].kout>0)
+	if(WG->node[i].kout>0)
 	{
     //printf("start, %d, %d \n",i,node[i].kin);fflush(stdout);
     	e=ee=0;
 	//printf("node=%i\n",i);
 	///for per cada vei j
-	for(j=0;j<node[i].kout;++j)
+	for(j=0;j<WG->node[i].kout;++j)
 	{
-	    //printf("vei=%i amb degree=%i\n",node[i].out[j],node[node[i].out[j]].k);
+	    //printf("vei=%i amb degree=%i\n",node[i].out[j],node[WG->node[i].out[j]].k);
 	    ///for per els altres nodes veins de i. comencem a j+1 per no repetir
-	    for(k=j+1;k<node[i].kout;++k)
+	    for(k=j+1;k<WG->node[i].kout;++k)
 	    {
 		//printf("segon_vei=%i\n",node[i].out[k]);
 		///un for per veure els veins del node j i veure si esta conectat amb el node k
-		for (l=0;l<node[node[i].out[j]].kout;++l)
+		for (l=0;l<WG->node[WG->node[i].out[j]].kout;++l)
 		{
 		    //printf("l=%i\n",l);
-		    if(node[node[i].out[j]].out[l]==node[i].out[k]) 
+		    if(WG->node[WG->node[i].out[j]].out[l]==WG->node[i].out[k]) 
 		    {
 			e=e+1;
-			ee+=(node[i].w_out[j]+node[i].w_out[k]);
+			ee+=(WG->node[i].w_out[j]+WG->node[i].w_out[k]);
 		    } 
-		    //printf("   node=%i vei=%i veivei=%i veicomparar=%i  e=%i\n",i,node[i].out[j],node[node[i].out[j]].out[l],node[i].out[k],e);
+		    //printf("   node=%i vei=%i veivei=%i veicomparar=%i  e=%i\n",i,node[i].out[j],node[WG->node[i].out[j]].out[l],node[i].out[k],e);
 		}
 	    }
 	}                        
 	if(e!=0)
         {
 	    c_glo=c_glo+e; // triangles
-	    c_glo_den=c_glo_den+node[i].kout*(node[i].kout-1)/2; // pairs of neighbours
-	    //cc=cc+(double)e*2./node[i].k/(node[i].k-1); // l
-	    c[0][i]= (double)e*2./node[i].kout/(node[i].kout-1); // clustering
-	    c[1][i]= (double)ee/(2.*node[i].sout)/(node[i].kout-1); // weighted clust
+	    c_glo_den=c_glo_den+WG->node[i].kout*(WG->node[i].kout-1)/2; // pairs of neighbours
+	    //cc=cc+(double)e*2./node[i].k/(WG->node[i].k-1); // l
+	    c[0][i]= (double)e*2./WG->node[i].kout/(WG->node[i].kout-1); // clustering
+	    c[1][i]= (double)ee/(2.*WG->node[i].sout)/(WG->node[i].kout-1); // weighted clust
 	}
     	}
         //printf("stop, %d\n",i);fflush(stdout);
@@ -467,29 +463,29 @@ double ** w_graph_compute_clust(w_graph * node, int N_nodes){ // 2 cols: unweigh
 /****************************************************************************
  * Weight funcs *
  ****************************************************************************/
-int w_graph_total_weight( w_graph* node, int N_nodes){
+int w_graph_total_weight( W_GRAPH* WG, int N_nodes){
     int i;
     int T;
     T=0;
     for(i=0;i<N_nodes;i++)
     {
-        T+=(int)node[i].sout;
+        T+=(int)WG->node[i].sout;
     }
     return T;
 }
 
-int w_graph_total_edges( w_graph* node, int N_nodes){
+int w_graph_total_edges( W_GRAPH* WG, int N_nodes){
     // counts self loops properly (bit more slower... but ok)
     int i,j;
     int T,aux2;
     T=aux2=0;
     for(i=0;i<N_nodes;i++)
     {
-        T+=node[i].kout;
-        for(j=0;j<node[i].kout;j++)
+        T+=WG->node[i].kout;
+        for(j=0;j<WG->node[i].kout;j++)
         {
             aux2++;
-            if(node[i].out[j]==i)
+            if(WG->node[i].out[j]==i)
             {
                 aux2++;
             }
@@ -500,9 +496,9 @@ int w_graph_total_edges( w_graph* node, int N_nodes){
 }
 
 
-int * w_graph_compute_w(w_graph* node, int N_nodes, int* aux, int zeros){
+int * w_graph_compute_w(W_GRAPH* WG, int N_nodes, int* aux, int zeros){
     //zeros not implemented
-    int E = w_graph_total_edges( node, N_nodes);
+    int E = w_graph_total_edges( WG, N_nodes);
     int* w=cast_vec_int(E);
     int i,j,aux2,mem;
     mem=E;
@@ -511,23 +507,23 @@ int * w_graph_compute_w(w_graph* node, int N_nodes, int* aux, int zeros){
     {
         for(i=0;i<N_nodes;i++)
         {
-            for(j=0;j<node[i].kout;j++)
+            for(j=0;j<WG->node[i].kout;j++)
             {
                 if(aux2+1>mem)
                 {
                     w=realloc(w, sizeof(int)*2*mem);
                     mem=2*mem;
                 }
-                w[aux2]=(int)node[i].w_out[j];
+                w[aux2]=(int)WG->node[i].w_out[j];
                 aux2++;
-                if(node[i].out[j]==i) // count twice
+                if(WG->node[i].out[j]==i) // count twice
                 {
                     if(aux2+1>mem)
                     {
                         w=realloc(w, sizeof(int)*2*mem);
                         mem=2*mem;
                     }
-                    w[aux2]=(int)node[i].w_out[j];
+                    w[aux2]=(int)WG->node[i].w_out[j];
                     aux2++;
                 }
 
@@ -536,23 +532,23 @@ int * w_graph_compute_w(w_graph* node, int N_nodes, int* aux, int zeros){
     }else{
         for(i=0;i<N_nodes;i++)
         {
-            for(j=0;j<node[i].kout;j++)
+            for(j=0;j<WG->node[i].kout;j++)
             {
                 if(aux2+1>mem)
                 {
                     w=realloc(w, sizeof(int)*2*mem);
                     mem=2*mem;
                 }
-                w[aux2]=(int)node[i].w_out[j];
+                w[aux2]=(int)WG->node[i].w_out[j];
                 aux2++;
-                if(node[i].out[j]==i)
+                if(WG->node[i].out[j]==i)
                 {
                     if(aux2+1>mem)
                     {
                         w=realloc(w, sizeof(int)*2*mem);
                         mem=2*mem;
                     }
-                    w[aux2]=(int)node[i].w_out[j];
+                    w[aux2]=(int)WG->node[i].w_out[j];
                     aux2++;
                 }
                 
@@ -684,32 +680,32 @@ double** w_graph_compute_p_w_analitic_from_s_directed(int maxt, double binn, int
     return p;
 }
 
-double * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight){
-//int * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight){
+double * w_graph_compute_w_ss(W_GRAPH* WG, int N_nodes, int weight){
+//int * w_graph_compute_w_ss(W_GRAPH* node, int N_nodes, int weight){
     int E;
-    E=w_graph_total_edges(node,N_nodes);
+    E=w_graph_total_edges(WG,N_nodes);
     //int* ww=cast_vec_int(E);
     double* ww=cast_vec_double(E);
     int i,j,aux;
     aux=0;
     for(i=0;i<N_nodes;i++)
     {
-        for(j=0;j<node[i].kout;j++)
+        for(j=0;j<WG->node[i].kout;j++)
         {
             if (weight>0)
             {
-                ww[aux]=((double)node[i].sout)*((double)node[node[i].out[j]].sin);
+                ww[aux]=((double)WG->node[i].sout)*((double)WG->node[WG->node[i].out[j]].sin);
             }else{
-                ww[aux]=((double)node[i].kout)*((double)node[node[i].out[j]].kin);
+                ww[aux]=((double)WG->node[i].kout)*((double)WG->node[WG->node[i].out[j]].kin);
             }
             aux++;
-            if(node[i].out[j]==i) // if self loop, count twice
+            if(WG->node[i].out[j]==i) // if self loop, count twice
             {
                 if (weight>0)
                 {
-                    ww[aux]=((double)node[i].sout)*((double)node[node[i].out[j]].sin);
+                    ww[aux]=((double)WG->node[i].sout)*((double)WG->node[WG->node[i].out[j]].sin);
                 }else{
-                    ww[aux]=((double)node[i].kout)*((double)node[node[i].out[j]].kin);
+                    ww[aux]=((double)WG->node[i].kout)*((double)WG->node[WG->node[i].out[j]].kin);
                 }
                 aux++;
             }
@@ -726,7 +722,7 @@ double * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight){
     //double** y2=cast_mat_double(3,N_nodes);
     //for(i=0;i<N_nodes;i++)
     //{
-	//if(node[i].kout>0)
+	//if(WG->node[i].kout>0)
 	//{
         //y2[0][i]=0;
 	    //for(j=0;j<node[i].kout;j++)
@@ -741,38 +737,38 @@ double * w_graph_compute_w_ss(w_graph* node, int N_nodes, int weight){
 //}
 
 
-double ** w_graph_compute_Y2(w_graph * node, int N_nodes, int opt_dir){
+double ** w_graph_compute_Y2(W_GRAPH * WG, int N_nodes, int opt_dir){
     
     int i,j;
     double** y2=cast_mat_double(2,N_nodes);
     for(i=0;i<N_nodes;i++)
     {
 	y2[0][i]=0;
-	if(node[i].kout>0)
+	if(WG->node[i].kout>0)
 	{
-	    for(j=0;j<node[i].kout;j++)
+	    for(j=0;j<WG->node[i].kout;j++)
 	    {
-	    	y2[0][i]+=((double)node[i].w_out[j])*((double)node[i].w_out[j]);
-/*            if((node[i].w_out[j]<1) )
+	    	y2[0][i]+=((double)WG->node[i].w_out[j])*((double)WG->node[i].w_out[j]);
+/*            if((WG->node[i].w_out[j]<1) )
             {
-                printf("%f\n",(double)node[i].w_out[j]);
+                printf("%f\n",(double)WG->node[i].w_out[j]);
             }
  */
 	    }
-	    y2[0][i]/=(((double)node[i].sout)*((double)node[i].sout));
+	    y2[0][i]/=(((double)WG->node[i].sout)*((double)WG->node[i].sout));
     }
 	y2[1][i]=0;
-	if((node[i].kin>0) && (opt_dir>0))
+	if((WG->node[i].kin>0) && (opt_dir>0))
 	{        
-	    for(j=0;j<node[i].kin;j++)
+	    for(j=0;j<WG->node[i].kin;j++)
 	    {
-            	y2[1][i]+=((double)node[i].w_in[j])*((double)node[i].w_in[j]);            
+            	y2[1][i]+=((double)WG->node[i].w_in[j])*((double)WG->node[i].w_in[j]);            
 	    }
-	    y2[1][i]/=(((double)node[i].sin)*((double)node[i].sin));
+	    y2[1][i]/=(((double)WG->node[i].sin)*((double)WG->node[i].sin));
     }
 /*    if((y2[0][i] >0)|( y2[1][i] >0))
        {
-           printf("out y2:%f \t s: %d \t k: %d\n in y2:%f \t s: %d \t k: %d\n\n",y2[0][i],node[i].sout,node[i].kout,y2[1][i],node[i].sin,node[i].kin); fflush(stdout);
+           printf("out y2:%f \t s: %d \t k: %d\n in y2:%f \t s: %d \t k: %d\n\n",y2[0][i],WG.WG->node[i].sout,WG->node[i].kout,y2[1][i],WG->node[i].sin,WG->node[i].kin); fflush(stdout);
        }
 */
     }
@@ -782,16 +778,16 @@ double ** w_graph_compute_Y2(w_graph * node, int N_nodes, int opt_dir){
 /****************************************************************************
  * Entropy & LIkelyhood funcs *
  ****************************************************************************/
-double w_graph_entropy(w_graph* node, int N_nodes){
+double w_graph_entropy(W_GRAPH* WG, int N_nodes){
 	double S,p;
 	int i,j,t;
-	int T = w_graph_total_weight(node,N_nodes);
+	int T = w_graph_total_weight(WG,N_nodes);
 	S = 0;
 	for(i=0;i<N_nodes;i++) // all edges
 	{
-		for(j=0;j<node[i].kout;j++)
+		for(j=0;j<WG->node[i].kout;j++)
 		{
-			t = node[i].w_out[j];
+			t = WG->node[i].w_out[j];
 			p = (double)t/(double)T;
 			S+= p*log(p);
 		}		
@@ -818,17 +814,17 @@ void w_graph_print_entropy(double* seq,int len,char* output){
 	return;
 }
 
-double w_graph_loglikelyhood(w_graph* node,int N_nodes,double** wij){
+double w_graph_loglikelyhood(W_GRAPH* WG,int N_nodes,double** wij){
 	double L=0;
 	int i,j,t;
 	double p,mu;
-	//int T = w_graph_total_weight(node,N_nodes);
+	//int T = w_graph_total_weight(WG->node,N_nodes);
 	for(i=0;i<N_nodes;i++) // all edges
 	{
-		for(j=0;j<node[i].kout;j++)
+		for(j=0;j<WG->node[i].kout;j++)
 		{
-			t = node[i].w_out[j];
-			mu = wij[i][node[i].out[j]];
+			t = WG->node[i].w_out[j];
+			mu = wij[i][WG->node[i].out[j]];
 			if(mu>0)
 			{
 				p = gsl_ran_poisson_pdf (t, mu);
@@ -843,17 +839,17 @@ double w_graph_loglikelyhood(w_graph* node,int N_nodes,double** wij){
 /****************************************************************************
  * aLL STATS *
  ****************************************************************************/
-void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, int opt_dir, int opt_clust, int self_opt){
+void w_graph_node_stats_list(W_GRAPH* WG, int N_nodes, int run, double av_k, int opt_dir, int opt_clust, int self_opt){
     //p(k),p(s),p(w),w(sin sout), s_nn, k_nn, s(k)
-    int **k=w_graph_compute_k(node, N_nodes);
-    int **s=w_graph_compute_s(node, N_nodes);
+    int **k=w_graph_compute_k(WG, N_nodes);
+    int **s=w_graph_compute_s(WG, N_nodes);
     //int E;
     //long int T=sum_vec_int(s[0],N_nodes);
-    //int *wkk2=w_graph_compute_w_ss(node, N_nodes, 0);
-    double ** ss_n=w_graph_compute_s_nn(node, N_nodes,1, opt_dir);// 4 rows
-    double ** kk_n=w_graph_compute_s_nn(node, N_nodes,-1, opt_dir);// 4 rows
-    double ** kkw_n=w_graph_compute_s_nn(node, N_nodes,0, opt_dir);// 4 rows
-    double **y2 = w_graph_compute_Y2(node, N_nodes, opt_dir); // 2 rows
+    //int *wkk2=w_graph_compute_w_ss(WG->node, N_nodes, 0);
+    double ** ss_n=w_graph_compute_s_nn(WG, N_nodes,1, opt_dir);// 4 rows
+    double ** kk_n=w_graph_compute_s_nn(WG, N_nodes,-1, opt_dir);// 4 rows
+    double ** kkw_n=w_graph_compute_s_nn(WG, N_nodes,0, opt_dir);// 4 rows
+    double **y2 = w_graph_compute_Y2(WG, N_nodes, opt_dir); // 2 rows
     char cadena[100];
     int i; 
     // Get analytical predictions //
@@ -868,7 +864,7 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
     FILE* fil=open_file("w", cadena);
     if(opt_dir==1)
     {
-    	double ** k_anal=w_graph_compute_k_analitic(node, N_nodes, self_opt);
+    	double ** k_anal=w_graph_compute_k_analitic(WG, N_nodes, self_opt);
 		// Note for indices on s_nn:
 		// [0] -> \sum t_{ij} s_out_j / s_out_i
 		// [1] -> \sum t_{ij} s_in_j / s_out_i
@@ -882,10 +878,10 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
     	}
 	free_mat_double(k_anal,2);
     }else{
-	double ** k_anal=w_graph_compute_k_analitic(node, N_nodes, self_opt);
+	double ** k_anal=w_graph_compute_k_analitic(WG, N_nodes, self_opt);
 	if(opt_clust==1)
 	{
-	    double ** c= w_graph_compute_clust(node, N_nodes); // 2 rows
+	    double ** c= w_graph_compute_clust(WG, N_nodes); // 2 rows
 	    fprintf(fil,"# Node_num\tk\tk_anal\ts\tY2\tk_nn\tk^w_nn\ts^w_nn\tc\tc^w# \n");
 	    for(i=0;i<N_nodes;i++)
 	    {
@@ -914,14 +910,14 @@ void w_graph_node_stats_list(w_graph* node, int N_nodes, int run, double av_k, i
 }
 
 
-void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, double av_k, int opt_dir, int self_opt, int w_anal){
+void w_graph_all_stats(W_GRAPH* WG, int N_nodes, int run, double bin_exp, double av_k, int opt_dir, int self_opt, int w_anal){
     //w(sin sout), w(kin,kout), w
-    int **k=w_graph_compute_k(node, N_nodes);
-    int **s=w_graph_compute_s(node, N_nodes);
+    int **k=w_graph_compute_k(WG, N_nodes);
+    int **s=w_graph_compute_s(WG, N_nodes);
     int E;
-    int *w=w_graph_compute_w(node, N_nodes, &E, -1);
-    double *wss=w_graph_compute_w_ss(node, N_nodes, 1);
-    double *wkk=w_graph_compute_w_ss(node, N_nodes, -1);
+    int *w=w_graph_compute_w(WG, N_nodes, &E, -1);
+    double *wss=w_graph_compute_w_ss(WG, N_nodes, 1);
+    double *wkk=w_graph_compute_w_ss(WG, N_nodes, -1);
     char cadena[100];
     
     gsl_histogram* h1;
@@ -1016,18 +1012,18 @@ void w_graph_all_stats(w_graph* node, int N_nodes, int run, double bin_exp, doub
  ****************************************************************************/
 
 // Nodes
-void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container, double ** container2, int** node_nonzero ,double* T_container, int opt_dir, int opt_clust ){
+void w_graph_node_stats_ensemble(W_GRAPH* WG, int N_nodes, double** container, double ** container2, int** node_nonzero ,double* T_container, int opt_dir, int opt_clust ){
     //p(k),p(s),p(w),w(sin sout), s_nn, k_nn, s(k)
-    int **k=w_graph_compute_k(node, N_nodes);
-    int **s=w_graph_compute_s(node, N_nodes);
+    int **k=w_graph_compute_k(WG, N_nodes);
+    int **s=w_graph_compute_s(WG, N_nodes);
     //int E;
     int T=sum_vec_int(s[0],N_nodes);
-    //int *wkk2=w_graph_compute_w_ss(node, N_nodes, 0);
-    double ** ss_n=w_graph_compute_s_nn(node, N_nodes,1, opt_dir);// 4 rows
-    double ** kk_n=w_graph_compute_s_nn(node, N_nodes,-1, opt_dir);// 4 rows
-    double ** kkw_n=w_graph_compute_s_nn(node, N_nodes,0, opt_dir);// 4 rows
-    double **y2 = w_graph_compute_Y2(node, N_nodes, opt_dir); // 2 rows
-    //double **xy = w_graph_compute_xy(node, N_nodes); // 2 rows
+    //int *wkk2=w_graph_compute_w_ss(WG->node, N_nodes, 0);
+    double ** ss_n=w_graph_compute_s_nn(WG, N_nodes,1, opt_dir);// 4 rows
+    double ** kk_n=w_graph_compute_s_nn(WG, N_nodes,-1, opt_dir);// 4 rows
+    double ** kkw_n=w_graph_compute_s_nn(WG, N_nodes,0, opt_dir);// 4 rows
+    double **y2 = w_graph_compute_Y2(WG, N_nodes, opt_dir); // 2 rows
+    //double **xy = w_graph_compute_xy(WG->node, N_nodes); // 2 rows
     //char cadena[100];
 		// Note for indices on s_nn:
 		// [0] -> \sum t_{ij} s_out_j / s_out_i
@@ -1079,7 +1075,7 @@ void w_graph_node_stats_ensemble(w_graph* node, int N_nodes, double** container,
     }else{
 		if(opt_clust==1)
 		{
-	    	double** c=w_graph_compute_clust(node, N_nodes);
+	    	double** c=w_graph_compute_clust(WG, N_nodes);
 	    	for(i=0;i<N_nodes;i++)
 	    	{
 	    		if(s[0][i] > 0)
@@ -1230,12 +1226,12 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
     /*
     gsl_histogram * h1;
     // str in
-    h1=histogram_double_log(node_atts[2],0,max_value_double(node_atts[2],N_nodes),bin_exp,N_nodes);
+    h1=histogram_double_log(WG->node_atts[2],0,max_value_double(WG->node_atts[2],N_nodes),bin_exp,N_nodes);
     sprintf(cadena,"N%davs%8.5fexpo%.2f_ens_r%dnode_sIN.hist",N_nodes,av_k,expo-1,reps);
     print_acc(cadena, h1, h1);
     gsl_histogram_free(h1);
     // degrees in
-    h1=histogram_double_log(node_atts[0],0,max_value_double(node_atts[0],N_nodes),bin_exp,N_nodes);
+    h1=histogram_double_log(WG->node_atts[0],0,max_value_double(WG->node_atts[0],N_nodes),bin_exp,N_nodes);
     sprintf(cadena,"N%davs%8.5fexpo%.2f_ens_r%dnode_kIN.hist",N_nodes,av_k,expo-1,reps);
     print_acc(cadena, h1, h1);
     gsl_histogram_free(h1);
@@ -1243,12 +1239,12 @@ void w_graph_node_stats_ensemble_print(int reps, int N_nodes, double* Tcont, dou
     if(opt_dir==1)
     {
     // degrees out
-    h1=histogram_double_log(node_atts[7],0,max_value_double(node_atts[7],N_nodes),bin_exp,N_nodes);	
+    h1=histogram_double_log(WG->node_atts[7],0,max_value_double(WG->node_atts[7],N_nodes),bin_exp,N_nodes);	
     sprintf(cadena,"N%davs%8.5fexpo%.2f_ens_r%dnode_kOUT.hist",N_nodes,av_k,expo-1,reps);
     print_acc(cadena, h1, h1);
     gsl_histogram_free(h1);
     // str out
-    h1=histogram_double_log(node_atts[9],0,max_value_double(node_atts[9],N_nodes),bin_exp,N_nodes);
+    h1=histogram_double_log(WG->node_atts[9],0,max_value_double(WG->node_atts[9],N_nodes),bin_exp,N_nodes);
     sprintf(cadena,"N%davs%8.5fexpo%.2f_ens_r%dnode_sOUT.hist",N_nodes,av_k,expo-1,reps);
     print_acc(cadena, h1, h1);
     gsl_histogram_free(h1);
@@ -1302,11 +1298,11 @@ gsl_histogram ** w_graph_all_stats_ensemble_allocate(int dir, int s_min, int s_m
 	return acc;
 }
 
-void w_graph_all_stats_ensemble_update(gsl_histogram** acc, w_graph* node, int N_nodes, int dir){
+void w_graph_all_stats_ensemble_update(gsl_histogram** acc, W_GRAPH* WG, int N_nodes, int dir){
     	int E;
-	//int **k=w_graph_compute_k(node, N_nodes);
-	//int **s=w_graph_compute_s(node, N_nodes);
-	int *w=w_graph_compute_w(node, N_nodes, &E, -1);
+	//int **k=w_graph_compute_k(WG->node, N_nodes);
+	//int **s=w_graph_compute_s(WG->node, N_nodes);
+	int *w=w_graph_compute_w(WG, N_nodes, &E, -1);
 	//long int T=sum_vec_int(s[0],N_nodes);
 	/*
 	if(dir==1)

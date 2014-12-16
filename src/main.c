@@ -24,8 +24,7 @@
 
 
 
-#include <stdio.h>
-#include <math.h>
+
 #include "main.h"
 
 
@@ -246,7 +245,7 @@ int main(int argc, char *argv[]){
 	Preparing ensemble reps!
  ************************************************************************/ 	
 	int r, len_acc_nodes;
-	w_graph* node;
+	W_GRAPH* WG;
 	double ** node_cont; //node info container for averaging
 	double ** node_cont2; // node info std for averaging
 	int ** node_nonzero; // node count non-zero strength/degree
@@ -347,19 +346,19 @@ int main(int argc, char *argv[]){
 			{
 				//printf("-- Sorry, not implemented poisson for grand-canonical directed case, aborting --\n");
 				//abort();
-				node = uncorrelated_poisson_directed_graph2(x2, N_nodes, randgsl, verbose, self_opt);
+				WG = uncorrelated_poisson_directed_graph2(x2, N_nodes, randgsl, verbose, self_opt);
 				// not implemented!
 			}else{
-				node = uncorrelated_poisson_undirected_graph2(x, N_nodes, randgsl, verbose, self_opt); // more stable with big T,N
+				WG = uncorrelated_poisson_undirected_graph2(x, N_nodes, randgsl, verbose, self_opt); // more stable with big T,N
 
 			}
 		}else if(meth==3){
 			if(verbose==1) printf("============### Rewiring model ####===========\n"); fflush(stdout);
 			if(opt_dir==1)
 			{
-				node = uncorrelated_computational_directed_graph(xx2,N_nodes, randgsl,verbose, self_opt);
+				WG = uncorrelated_computational_directed_graph(xx2,N_nodes, randgsl,verbose, self_opt);
 			}else{
-				node = uncorrelated_computational_undirected_graph(xx,N_nodes, randgsl, 100000, verbose, self_opt);
+				WG = uncorrelated_computational_undirected_graph(xx,N_nodes, randgsl, 100000, verbose, self_opt);
 			}
 		}else{
 			if(meth==0)
@@ -367,24 +366,24 @@ int main(int argc, char *argv[]){
 				if(verbose==1)printf("============### Multinomial model ####===========\n"); fflush(stdout);
 				if(opt_dir==1)
 				{
-					node = uncorrelated_multinomial_directed_graph(ps, x2, N_nodes, T, randgsl,verbose, self_opt);
+					WG = uncorrelated_multinomial_directed_graph(ps, x2, N_nodes, T, randgsl,verbose, self_opt);
 				}else{
-					node = uncorrelated_multinomial_undirected_graph(ps, x, N_nodes, T, randgsl,verbose, self_opt);
+					WG = uncorrelated_multinomial_undirected_graph(ps, x, N_nodes, T, randgsl,verbose, self_opt);
 				}
 			}else{
 				if(verbose==1)printf("============### Poisson Multinomial model ####===========\n"); fflush(stdout);
 				if(opt_dir==1)
 				{
-					node = uncorrelated_poisson_multinomial_directed_graph(ps, x2, N_nodes, T, randgsl, verbose, self_opt);
+					WG = uncorrelated_poisson_multinomial_directed_graph(ps, x2, N_nodes, T, randgsl, verbose, self_opt);
 				}else{
-					node = uncorrelated_poisson_multinomial_undirected_graph(ps, x, N_nodes, T, randgsl, verbose, self_opt);
+					WG = uncorrelated_poisson_multinomial_undirected_graph(ps, x, N_nodes, T, randgsl, verbose, self_opt);
 				}
 			}
 		}
 		if(r==0) // if first rep, store all stats
 		{
-			w_graph_all_stats(node, N_nodes, 0,  bin_exp, av_k, opt_dir,self_opt, w_anal);
-			w_graph_node_stats_list(node,N_nodes,0, av_k, opt_dir, opt_clust, self_opt);
+			w_graph_all_stats(WG, N_nodes, 0,  bin_exp, av_k, opt_dir,self_opt, w_anal);
+			w_graph_node_stats_list(WG,N_nodes,0, av_k, opt_dir, opt_clust, self_opt);
             char cadena[100];
             if(print_tr==1)
             {
@@ -394,12 +393,13 @@ int main(int argc, char *argv[]){
                     fflush(stdout);
                 }
                 sprintf(cadena,"N%d_cust.tr",N_nodes);
-                w_graph_print_adj_list(node, N_nodes, cadena);
+                w_graph_print_adj_list(WG, N_nodes, cadena);
             }
 		}
-		w_graph_node_stats_ensemble(node,N_nodes,node_cont,node_cont2,node_nonzero, Tcont,opt_dir,opt_clust);
-		w_graph_all_stats_ensemble_update(acc_ensemble,node, N_nodes, opt_dir);
-		w_graph_free(node, N_nodes);
+		w_graph_node_stats_ensemble(WG,N_nodes,node_cont,node_cont2,node_nonzero, Tcont,opt_dir,opt_clust);
+		w_graph_all_stats_ensemble_update(acc_ensemble,WG, N_nodes, opt_dir);
+		w_graph_free_nodes(WG, N_nodes);
+		free(WG);
 	}
 	if(meth<2) free(ps);
 /***********************************************************************
