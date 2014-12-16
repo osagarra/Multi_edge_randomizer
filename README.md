@@ -151,15 +151,25 @@ bin_id bin_min bin_max Bin_count Bin_std CCDF
 For the case of a single realization, the histogram is not normalized, while for the ensemble average "ens_" file the histogram is normalized.
 
 **Example**:
+We average over 10 instances of a network composed by *N=9999* nodes with a strength distribution in a power law form with exponent *gamma=2.5* and average graph strength 10000.:
+```
+	$ ./MultiEdgeGen -N 9999 -d 0 -f tests/N1e4_exp_2.5_avs_10000.strength -r 10
+```
+Which takes on a intel® Core™ i5-2500 CPU @ 3.30GHz × 4 with 12 GM RAM the following time
+```
+real	6m13.022s
+user	6m10.425s
+sys	0m2.017s
+```
+After execution, for the out-strength distribution, for instance, 3 files are produced:
 
-For the out-strength distribution, for instance, 3 files are produced for 10 reps and *avs=500*:
 
-*N5000avs499.88180_w.hist*			One realization of the network P(w)
-*N5000avs499.88180_ens_r1_w.hist*	Ensemble average distribution <P(w)>
-*N5000avs499.88180_ens_r1node.list*	Ensemble averages for different node features
-*N5000avs499.88180node.list*		Graph values for single realization over node features
-*N5000avs499.88180_w_s_io.hist*		Existing Occupation number average as function of s_in s_out over single realization
-*N5000avs499.88180_w_k_io.hist*		Existing Occupation number average as function of k_in k_out over single realization
+*N9999avs9647.65707_undir_ens_r10_w.hist*			One realization of the network P(w)
+*N9999avs9647.65707_undir_ens_r10_ens_r1_w.hist*	Ensemble average distribution <P(w)>
+*N9999avs9647.65707_undir_ens_r10_ens_r1node.list*	Ensemble averages for different node features
+*N9999avs9647.65707_undir_ens_r10node.list*			Graph values for single realization over node features
+*N9999avs9647.65707_undir_ens_r10_w_s_io.hist*		Existing Occupation number average as function of s_in s_out over single realization
+*N9999avs9647.65707_undir_ens_r10_w_k_io.hist*		Existing Occupation number average as function of k_in k_out over single realization
 
 The undirected version of the algorithm produces equivalent files for the *in* and *out* values.
 
@@ -167,8 +177,6 @@ The undirected version of the algorithm produces equivalent files for the *in* a
 ## Acknowledgements
 
 We would like to thank Pol Colomer and Sergio Oller for their very useful comments and suggestions.
-
-
 
 ## License
 
