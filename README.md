@@ -48,7 +48,7 @@ Examples
 ______________
  Generate ensemble averages for the maximum entropy grand-canonical network with prescribed strength sequence given by netFilename over 1000 reps and print an instance of such ensemble.
  	
-    $ ./MutliEdgeRand -f netFILEname -d 1 -N 940 -r 1000 -p 1
+    $ ./MutliEdgeRand -f strenth_sequence_file -d 1 -N 940 -r 1000 -p 1
  
  
 ## Options and Arguments
@@ -151,7 +151,8 @@ bin_id bin_min bin_max Bin_count Bin_std CCDF
 ```
 For the case of a single realization, the histogram is not normalized, while for the ensemble average "ens_" file the histogram is normalized.
 
-**Example**:
+##Examples
+
 We average over 10 instances of a network composed by *N=9999* nodes with a strength distribution in a power law form with exponent *gamma=2.5* and average graph strength 10000.:
 ```
 	$ ./MultiEdgeGen -N 9999 -d 0 -f tests/N1e4_exp_2.5_avs_10000.strength -r 10
