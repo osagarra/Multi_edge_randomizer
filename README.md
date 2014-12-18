@@ -47,7 +47,8 @@ Arguments can appear in any order. If an argument does not appear the program ge
 Examples
 ______________
  Generate ensemble averages for the maximum entropy grand-canonical network with prescribed strength sequence given by netFilename over 1000 reps and print an instance of such ensemble.
- 	$ ./MutliEdgeRand -f netFILEname -d 1 -N 940 -r 1000 -p 1
+ 	
+    $ ./MutliEdgeRand -f netFILEname -d 1 -N 940 -r 1000 -p 1
  
  
 ## Options and Arguments
