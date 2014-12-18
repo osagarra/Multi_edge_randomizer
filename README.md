@@ -165,13 +165,15 @@ sys	0m2.017s
 ```
 After execution, for the out-strength distribution, for instance, 3 files are produced:
 
+```
+N9999avs9647.65707_undir_ens_r10_w.hist*			One realization of the network P(w)
+N9999avs9647.65707_undir_ens_r10_ens_r1_w.hist*	Ensemble average distribution <P(w)>
+N9999avs9647.65707_undir_ens_r10_ens_r1node.list*	Ensemble averages for different node features
+N9999avs9647.65707_undir_ens_r10node.list			Graph values for single realization over node features
+N9999avs9647.65707_undir_ens_r10_w_s_io.hist		Existing Occupation number average as function of s_in s_out over single realization
+N9999avs9647.65707_undir_ens_r10_w_k_io.hist		Existing Occupation number average as function of k_in k_out over single realization
+```
 
-*N9999avs9647.65707_undir_ens_r10_w.hist*			One realization of the network P(w)
-*N9999avs9647.65707_undir_ens_r10_ens_r1_w.hist*	Ensemble average distribution <P(w)>
-*N9999avs9647.65707_undir_ens_r10_ens_r1node.list*	Ensemble averages for different node features
-*N9999avs9647.65707_undir_ens_r10node.list*			Graph values for single realization over node features
-*N9999avs9647.65707_undir_ens_r10_w_s_io.hist*		Existing Occupation number average as function of s_in s_out over single realization
-*N9999avs9647.65707_undir_ens_r10_w_k_io.hist*		Existing Occupation number average as function of k_in k_out over single realization
 
 The undirected version of the algorithm produces equivalent files for the *in* and *out* values.
 
