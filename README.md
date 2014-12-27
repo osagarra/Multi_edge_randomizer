@@ -12,6 +12,9 @@ Using different ensembles may be useful for performance issues: For the case of 
 
 Comparing real networks with their randomized counterparts is very useful for data analysis and detection of statistically significant patterns. With this software you migh do just that, but if you use our software please do cite us.
 
+## Important Notice
+The present code has been expanded and included in one of the modules of the [ODME package](http://github.com/osagarra/odme_lite), that now includes all the cases regarded in reference [1]. The present software is kept for backwards compatibility and also because it includes the microcanoical implementation (not present in *ODME*).
+
 ## References 
 
 [1] Statistical mechanics of multiedge networks
